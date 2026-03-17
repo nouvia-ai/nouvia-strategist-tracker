@@ -30,7 +30,8 @@ export default function AuthGate({ children }) {
       setError(null);
       await signInWithPopup(auth, googleProvider);
     } catch (e) {
-      setError('Sign-in failed. Try again.');
+      console.error('Sign-in error:', e.code, e.message);
+      setError(`Error: ${e.code} — ${e.message}`);
     }
   };
 
@@ -51,7 +52,7 @@ export default function AuthGate({ children }) {
           </div>
           <h1 className="text-xl font-semibold text-zinc-100 mb-2">Nouvia Strategist</h1>
           <p className="text-sm text-zinc-500 mb-6">Sign in to access your strategy dashboard</p>
-          {error && <p className="text-sm text-red-400 mb-4">{error}</p>}
+          {error && <p className="text-sm text-red-400 mb-4 max-w-md mx-auto break-words">{error}</p>}
           <button
             onClick={handleSignIn}
             className="bg-zinc-100 text-zinc-900 text-sm font-medium px-6 py-2.5 rounded-lg hover:bg-white transition-colors"

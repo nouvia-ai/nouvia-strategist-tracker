@@ -3,7 +3,7 @@ import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBN3fwHPjhseL-XJsulQNVFJSIn1e9Cz9E",
+  apiKey: "AIzaSyBN3fwHPjhseL-XJsulQNVFJSInIe9Cz9E",
   authDomain: "nouvia-os.firebaseapp.com",
   projectId: "nouvia-os",
   storageBucket: "nouvia-os.firebasestorage.app",

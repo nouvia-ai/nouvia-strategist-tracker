@@ -452,6 +452,8 @@ function Dashboard({ clients, experiments, decisions, trends, canvas, coworkers,
 export default function App() {
   const [tab, setTab] = useState("dashboard");
   const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState(() => localStorage.getItem("strategist:theme") || "dark");
+  const toggleTheme = () => { const next = theme === "dark" ? "light" : "dark"; setTheme(next); localStorage.setItem("strategist:theme", next); };
   const [clients, setClients] = useState([]);
   const [experiments, setExperiments] = useState([]);
   const [decisions, setDecisions] = useState([]);
@@ -480,14 +482,15 @@ export default function App() {
   const sv = useCallback(d => saveData(STORAGE_KEYS.canvas, d), []);
   const sw = useCallback(d => saveData(STORAGE_KEYS.coworkers, d), []);
 
-  if (loading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center"><div className="text-zinc-500 text-sm">Loading...</div></div>;
+  if (loading) return <div data-theme={theme} className="min-h-screen bg-zinc-950 flex items-center justify-center"><div className="text-zinc-500 text-sm">Loading...</div></div>;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+    <div data-theme={theme} className="min-h-screen bg-zinc-950 text-zinc-100 transition-colors duration-200" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
       <div className="border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-4">
           <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-2"><div className="w-6 h-6 bg-zinc-100 rounded-md flex items-center justify-center"><span className="text-zinc-900 text-xs font-bold">N</span></div><span className="text-sm font-semibold text-zinc-200 tracking-tight">Nouvia Strategist</span></div>
+            <button onClick={toggleTheme} className="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-colors text-sm" title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>{theme === "dark" ? "☀" : "☾"}</button>
           </div>
           <div className="flex gap-0.5 -mb-px overflow-x-auto">
             {TABS.map(t => <button key={t.id} onClick={() => setTab(t.id)} className={`px-2.5 py-2 text-xs font-medium whitespace-nowrap border-b-2 transition-colors ${tab === t.id ? "border-zinc-100 text-zinc-100" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}><span className="mr-1">{t.icon}</span>{t.label}</button>)}

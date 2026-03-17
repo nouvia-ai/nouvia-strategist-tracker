@@ -1,3 +1,101 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ─── LIGHT THEME OVERRIDES ─────────────────────── */
+[data-theme="light"] {
+  /* Page backgrounds */
+  .bg-zinc-950 { background-color: #fafafa !important; }
+  .bg-zinc-950\/90 { background-color: rgba(255,255,255,0.92) !important; }
+  .bg-zinc-900\/80 { background-color: rgba(249,250,251,0.8) !important; }
+  .bg-zinc-900\/40 { background-color: rgba(244,244,245,0.4) !important; }
+
+  /* Card / surface backgrounds */
+  .bg-zinc-800 { background-color: #ffffff !important; }
+  .bg-zinc-800\/60 { background-color: rgba(244,244,245,0.7) !important; }
+  .bg-zinc-800\/50 { background-color: rgba(244,244,245,0.6) !important; }
+  .bg-zinc-800\/40 { background-color: rgba(244,244,245,0.5) !important; }
+  .bg-zinc-800\/30 { background-color: rgba(244,244,245,0.4) !important; }
+
+  /* Primary button / logo (invert) */
+  .bg-zinc-100 { background-color: #18181b !important; }
+  .text-zinc-900 { color: #fafafa !important; }
+  .hover\:bg-white:hover { background-color: #27272a !important; }
+
+  /* Secondary button */
+  .hover\:bg-zinc-800:hover { background-color: #f4f4f5 !important; }
+  .hover\:bg-zinc-700:hover { background-color: #e4e4e7 !important; }
+
+  /* Text colors */
+  .text-zinc-100 { color: #18181b !important; }
+  .text-zinc-200 { color: #27272a !important; }
+  .text-zinc-300 { color: #3f3f46 !important; }
+  .text-zinc-400 { color: #71717a !important; }
+  .text-zinc-500 { color: #71717a !important; }
+  .text-zinc-600 { color: #a1a1aa !important; }
+  .text-zinc-700 { color: #a1a1aa !important; }
+
+  /* Borders */
+  .border-zinc-800 { border-color: #e4e4e7 !important; }
+  .border-zinc-800\/80 { border-color: rgba(228,228,231,0.8) !important; }
+  .border-zinc-800\/50 { border-color: rgba(228,228,231,0.5) !important; }
+  .border-zinc-800\/30 { border-color: rgba(228,228,231,0.3) !important; }
+  .border-zinc-700 { border-color: #d4d4d8 !important; }
+  .border-zinc-700\/50 { border-color: rgba(212,212,216,0.5) !important; }
+
+  /* Hover text */
+  .hover\:text-zinc-300:hover { color: #3f3f46 !important; }
+  .hover\:text-zinc-400:hover { color: #52525b !important; }
+  .hover\:border-zinc-700:hover { border-color: #a1a1aa !important; }
+
+  /* Inputs */
+  .placeholder-zinc-500::placeholder { color: #a1a1aa !important; }
+  .focus\:border-zinc-500:focus { border-color: #a1a1aa !important; }
+  .focus\:ring-zinc-500:focus { --tw-ring-color: #a1a1aa !important; }
+  .placeholder-zinc-600::placeholder { color: #a1a1aa !important; }
+  .focus\:border-zinc-500:focus { border-color: #71717a !important; }
+
+  /* Tab active border */
+  .border-zinc-100 { border-color: #18181b !important; }
+  .border-transparent { border-color: transparent !important; }
+  .hover\:text-zinc-300:hover { color: #52525b !important; }
+
+  /* Badge colors */
+  .bg-zinc-700 { background-color: #e4e4e7 !important; }
+  .bg-blue-900\/60 { background-color: rgba(219,234,254,0.8) !important; }
+  .bg-emerald-900\/60 { background-color: rgba(209,250,229,0.8) !important; }
+  .bg-amber-900\/60 { background-color: rgba(254,243,199,0.8) !important; }
+  .bg-red-900\/60 { background-color: rgba(254,226,226,0.8) !important; }
+  .bg-purple-900\/60 { background-color: rgba(243,232,255,0.8) !important; }
+  .bg-cyan-900\/60 { background-color: rgba(207,250,254,0.8) !important; }
+  .text-blue-300 { color: #1d4ed8 !important; }
+  .text-emerald-300 { color: #047857 !important; }
+  .text-amber-300 { color: #b45309 !important; }
+  .text-red-300 { color: #b91c1c !important; }
+  .text-purple-300 { color: #7c3aed !important; }
+  .text-cyan-300 { color: #0e7490 !important; }
+
+  /* Canvas block borders */
+  .border-zinc-600 { border-color: #d4d4d8 !important; }
+  .border-blue-800 { border-color: #93c5fd !important; }
+  .border-emerald-800 { border-color: #6ee7b7 !important; }
+  .border-amber-800 { border-color: #fcd34d !important; }
+  .border-red-900 { border-color: #fca5a5 !important; }
+  .border-purple-800 { border-color: #c4b5fd !important; }
+
+  /* Canvas header colors */
+  .text-blue-400 { color: #2563eb !important; }
+  .text-emerald-400 { color: #059669 !important; }
+  .text-amber-400 { color: #d97706 !important; }
+  .text-red-400 { color: #dc2626 !important; }
+  .text-purple-400 { color: #7c3aed !important; }
+  .text-cyan-700 { color: #0891b2 !important; }
+
+  /* Misc */
+  .text-amber-500\/70 { color: rgba(217,119,6,0.8) !important; }
+  .text-red-400\/70 { color: rgba(220,38,38,0.7) !important; }
+  .hover\:text-red-400:hover { color: #dc2626 !important; }
+  .bg-emerald-500 { background-color: #10b981 !important; }
+  .bg-red-500 { background-color: #ef4444 !important; }
+  .text-red-400 { color: #dc2626 !important; }
+}
