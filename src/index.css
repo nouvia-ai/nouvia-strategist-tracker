@@ -2,100 +2,196 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── LIGHT THEME OVERRIDES ─────────────────────── */
+/* ─── BASE LAYER — Design tokens & global resets ── */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Smooth transitions when toggling themes */
+  [data-theme] {
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+}
+
+/* ─── DARK THEME REFINEMENTS ──────────────────────
+   Enhance the default dark palette for better depth,
+   contrast, and visual hierarchy per Apple HIG depth
+   principles (layered surfaces, subtle elevation).
+   ─────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  /* Sticky header — glassy depth layer (Apple Liquid Glass inspired) */
+  .backdrop-blur {
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  }
+
+  /* Card surfaces — subtle elevation via micro-shadow */
+  .rounded-lg.border {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03) !important;
+  }
+
+  /* Dashboard stat cards — elevated surfaces */
+  .rounded-xl.bg-zinc-800\/50 {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.04) !important;
+  }
+
+  /* Form cards — inner glow */
+  .rounded-xl.border.border-zinc-700\/50 {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+  }
+}
+
+/* ─── LIGHT THEME ─────────────────────────────────
+   Apple HIG-inspired: Clarity & deference to content.
+   Clean whites, subtle depth via shadow (not border),
+   proper WCAG AA contrast ratios (4.5:1 minimum).
+   M3-inspired semantic color roles for badges/accents.
+   ─────────────────────────────────────────────────── */
 [data-theme="light"] {
-  /* Page backgrounds */
-  .bg-zinc-950 { background-color: #fafafa !important; }
-  .bg-zinc-950\/90 { background-color: rgba(255,255,255,0.92) !important; }
-  .bg-zinc-900\/80 { background-color: rgba(249,250,251,0.8) !important; }
-  .bg-zinc-900\/40 { background-color: rgba(244,244,245,0.4) !important; }
 
-  /* Card / surface backgrounds */
-  .bg-zinc-800 { background-color: #ffffff !important; }
-  .bg-zinc-800\/60 { background-color: rgba(244,244,245,0.7) !important; }
-  .bg-zinc-800\/50 { background-color: rgba(244,244,245,0.6) !important; }
-  .bg-zinc-800\/40 { background-color: rgba(244,244,245,0.5) !important; }
-  .bg-zinc-800\/30 { background-color: rgba(244,244,245,0.4) !important; }
+  /* ── Surfaces ────────────────────────────────────
+     Three-tier surface system:
+     S0 = page bg (#f8fafc — warm off-white)
+     S1 = card bg (#ffffff — pure white, elevated)
+     S2 = inset bg (#f1f5f9 — recessed containers)
+  */
+  .bg-zinc-950       { background-color: #f8fafc !important; }
+  .bg-zinc-950\/90   { background-color: rgba(255,255,255,0.92) !important; }
+  .bg-zinc-900\/80   { background-color: #ffffff !important; }
+  .bg-zinc-900\/40   { background-color: #f8fafc !important; }
+  .bg-zinc-800       { background-color: #ffffff !important; }
+  .bg-zinc-800\/60   { background-color: #f8fafc !important; }
+  .bg-zinc-800\/50   { background-color: #ffffff !important; }
+  .bg-zinc-800\/40   { background-color: #ffffff !important; }
+  .bg-zinc-800\/30   { background-color: #f8fafc !important; }
 
-  /* Primary button / logo (invert) */
-  .bg-zinc-100 { background-color: #18181b !important; }
-  .text-zinc-900 { color: #fafafa !important; }
-  .hover\:bg-white:hover { background-color: #27272a !important; }
+  /* ── Primary action — inverted (dark button on light bg) */
+  .bg-zinc-100       { background-color: #0f172a !important; }
+  .text-zinc-900     { color: #ffffff !important; }
+  .hover\:bg-white:hover { background-color: #1e293b !important; }
 
-  /* Secondary button */
-  .hover\:bg-zinc-800:hover { background-color: #f4f4f5 !important; }
-  .hover\:bg-zinc-700:hover { background-color: #e4e4e7 !important; }
+  /* ── Secondary / tertiary buttons */
+  .hover\:bg-zinc-800:hover { background-color: #f1f5f9 !important; }
+  .hover\:bg-zinc-700:hover { background-color: #e2e8f0 !important; }
 
-  /* Text colors */
-  .text-zinc-100 { color: #18181b !important; }
-  .text-zinc-200 { color: #27272a !important; }
-  .text-zinc-300 { color: #3f3f46 !important; }
-  .text-zinc-400 { color: #71717a !important; }
-  .text-zinc-500 { color: #71717a !important; }
-  .text-zinc-600 { color: #a1a1aa !important; }
-  .text-zinc-700 { color: #a1a1aa !important; }
+  /* ── Text hierarchy (Slate palette) ──────────────
+     H1/Primary:   slate-900 (#0f172a) — 15.4:1 on white
+     H2/Secondary: slate-700 (#334155) — 9.7:1 on white
+     Body:         slate-600 (#475569) — 7.0:1 on white
+     Caption:      slate-500 (#64748b) — 4.6:1 on white (AA)
+     Muted:        slate-400 (#94a3b8) — 3.0:1 (decorative only)
+  */
+  .text-zinc-100 { color: #0f172a !important; }
+  .text-zinc-200 { color: #1e293b !important; }
+  .text-zinc-300 { color: #334155 !important; }
+  .text-zinc-400 { color: #64748b !important; }
+  .text-zinc-500 { color: #64748b !important; }
+  .text-zinc-600 { color: #94a3b8 !important; }
+  .text-zinc-700 { color: #94a3b8 !important; }
 
-  /* Borders */
-  .border-zinc-800 { border-color: #e4e4e7 !important; }
-  .border-zinc-800\/80 { border-color: rgba(228,228,231,0.8) !important; }
-  .border-zinc-800\/50 { border-color: rgba(228,228,231,0.5) !important; }
-  .border-zinc-800\/30 { border-color: rgba(228,228,231,0.3) !important; }
-  .border-zinc-700 { border-color: #d4d4d8 !important; }
-  .border-zinc-700\/50 { border-color: rgba(212,212,216,0.5) !important; }
+  /* ── Borders — subtle, layered ───────────────── */
+  .border-zinc-800      { border-color: #e2e8f0 !important; }
+  .border-zinc-800\/80  { border-color: #e2e8f0 !important; }
+  .border-zinc-800\/50  { border-color: #e2e8f0 !important; }
+  .border-zinc-800\/30  { border-color: #f1f5f9 !important; }
+  .border-zinc-700      { border-color: #cbd5e1 !important; }
+  .border-zinc-700\/50  { border-color: rgba(203,213,225,0.5) !important; }
+  .border-zinc-600      { border-color: #cbd5e1 !important; }
 
-  /* Hover text */
-  .hover\:text-zinc-300:hover { color: #3f3f46 !important; }
-  .hover\:text-zinc-400:hover { color: #52525b !important; }
-  .hover\:border-zinc-700:hover { border-color: #a1a1aa !important; }
+  /* ── Hover states */
+  .hover\:text-zinc-300:hover { color: #1e293b !important; }
+  .hover\:text-zinc-400:hover { color: #475569 !important; }
+  .hover\:border-zinc-700:hover { border-color: #94a3b8 !important; }
 
-  /* Inputs */
-  .placeholder-zinc-500::placeholder { color: #a1a1aa !important; }
-  .focus\:border-zinc-500:focus { border-color: #a1a1aa !important; }
-  .focus\:ring-zinc-500:focus { --tw-ring-color: #a1a1aa !important; }
-  .placeholder-zinc-600::placeholder { color: #a1a1aa !important; }
-  .focus\:border-zinc-500:focus { border-color: #71717a !important; }
+  /* ── Form inputs — white with visible border ── */
+  .placeholder-zinc-500::placeholder { color: #94a3b8 !important; }
+  .placeholder-zinc-600::placeholder { color: #94a3b8 !important; }
+  .focus\:border-zinc-500:focus { border-color: #475569 !important; }
+  .focus\:ring-zinc-500:focus { --tw-ring-color: #94a3b8 !important; }
 
-  /* Tab active border */
-  .border-zinc-100 { border-color: #18181b !important; }
+  /* ── Tab bar */
+  .border-zinc-100 { border-color: #0f172a !important; }
   .border-transparent { border-color: transparent !important; }
-  .hover\:text-zinc-300:hover { color: #52525b !important; }
 
-  /* Badge colors */
-  .bg-zinc-700 { background-color: #e4e4e7 !important; }
-  .bg-blue-900\/60 { background-color: rgba(219,234,254,0.8) !important; }
-  .bg-emerald-900\/60 { background-color: rgba(209,250,229,0.8) !important; }
-  .bg-amber-900\/60 { background-color: rgba(254,243,199,0.8) !important; }
-  .bg-red-900\/60 { background-color: rgba(254,226,226,0.8) !important; }
-  .bg-purple-900\/60 { background-color: rgba(243,232,255,0.8) !important; }
-  .bg-cyan-900\/60 { background-color: rgba(207,250,254,0.8) !important; }
-  .text-blue-300 { color: #1d4ed8 !important; }
+  /* ── Header bar — frosted glass */
+  .backdrop-blur {
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    background-color: rgba(248,250,252,0.85) !important;
+  }
+
+  /* ── Cards — Apple-style elevated surfaces ──────
+     White cards with subtle layered shadow instead
+     of heavy borders. Gestalt "Common Region" principle:
+     group related content via container + elevation.
+  */
+  .rounded-lg.border {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04) !important;
+  }
+
+  .rounded-xl.bg-zinc-800\/50 {
+    background-color: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04) !important;
+  }
+
+  .rounded-xl.border.border-zinc-700\/50 {
+    background-color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04) !important;
+  }
+
+  /* ── Badge colors — M3-inspired tonal surfaces ──
+     Each badge uses a light tonal fill + high-contrast
+     text that meets WCAG AA (4.5:1 minimum).
+  */
+  .bg-zinc-700 { background-color: #f1f5f9 !important; color: #475569 !important; }
+
+  .bg-blue-900\/60    { background-color: #dbeafe !important; }
+  .bg-emerald-900\/60 { background-color: #d1fae5 !important; }
+  .bg-amber-900\/60   { background-color: #fef3c7 !important; }
+  .bg-red-900\/60     { background-color: #fee2e2 !important; }
+  .bg-purple-900\/60  { background-color: #ede9fe !important; }
+  .bg-cyan-900\/60    { background-color: #cffafe !important; }
+
+  .text-blue-300    { color: #1d4ed8 !important; }
   .text-emerald-300 { color: #047857 !important; }
-  .text-amber-300 { color: #b45309 !important; }
-  .text-red-300 { color: #b91c1c !important; }
-  .text-purple-300 { color: #7c3aed !important; }
-  .text-cyan-300 { color: #0e7490 !important; }
+  .text-amber-300   { color: #b45309 !important; }
+  .text-red-300     { color: #b91c1c !important; }
+  .text-purple-300  { color: #6d28d9 !important; }
+  .text-cyan-300    { color: #0e7490 !important; }
 
-  /* Canvas block borders */
-  .border-zinc-600 { border-color: #d4d4d8 !important; }
-  .border-blue-800 { border-color: #93c5fd !important; }
-  .border-emerald-800 { border-color: #6ee7b7 !important; }
-  .border-amber-800 { border-color: #fcd34d !important; }
-  .border-red-900 { border-color: #fca5a5 !important; }
-  .border-purple-800 { border-color: #c4b5fd !important; }
+  /* ── Canvas block borders — vibrant semantic ── */
+  .border-blue-800    { border-color: #3b82f6 !important; }
+  .border-emerald-800 { border-color: #10b981 !important; }
+  .border-amber-800   { border-color: #f59e0b !important; }
+  .border-red-900     { border-color: #ef4444 !important; }
+  .border-purple-800  { border-color: #8b5cf6 !important; }
 
-  /* Canvas header colors */
-  .text-blue-400 { color: #2563eb !important; }
+  /* ── Canvas header text — vivid, high contrast ── */
+  .text-blue-400    { color: #2563eb !important; }
   .text-emerald-400 { color: #059669 !important; }
-  .text-amber-400 { color: #d97706 !important; }
-  .text-red-400 { color: #dc2626 !important; }
-  .text-purple-400 { color: #7c3aed !important; }
-  .text-cyan-700 { color: #0891b2 !important; }
+  .text-amber-400   { color: #d97706 !important; }
+  .text-red-400     { color: #dc2626 !important; }
+  .text-purple-400  { color: #7c3aed !important; }
+  .text-cyan-700    { color: #0891b2 !important; }
 
-  /* Misc */
-  .text-amber-500\/70 { color: rgba(217,119,6,0.8) !important; }
-  .text-red-400\/70 { color: rgba(220,38,38,0.7) !important; }
+  /* ── Status indicators */
+  .text-amber-500\/70   { color: #b45309 !important; }
+  .text-red-400\/70     { color: #dc2626 !important; }
   .hover\:text-red-400:hover { color: #dc2626 !important; }
   .bg-emerald-500 { background-color: #10b981 !important; }
-  .bg-red-500 { background-color: #ef4444 !important; }
-  .text-red-400 { color: #dc2626 !important; }
+  .bg-red-500     { background-color: #ef4444 !important; }
+  .text-red-400   { color: #dc2626 !important; }
+
+  /* ── Select dropdowns — match surface */
+  select {
+    background-color: #ffffff !important;
+    color: #334155 !important;
+  }
+  select option {
+    background-color: #ffffff !important;
+    color: #334155 !important;
+  }
 }

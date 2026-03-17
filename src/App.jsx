@@ -403,24 +403,24 @@ function Dashboard({ clients, experiments, decisions, trends, canvas, coworkers,
   const recentNotes = [...allNotes].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
 
   return <div>
-    <div className="mb-6"><h2 className="text-lg font-semibold text-zinc-100 mb-1">Nouvia Strategy Dashboard</h2><p className="text-xs text-zinc-500">Your living strategic operating system</p></div>
+    <div className="mb-8"><h2 className="text-xl font-semibold text-zinc-100 mb-1 tracking-tight">Strategy Dashboard</h2><p className="text-sm text-zinc-500">Your living strategic operating system</p></div>
 
-    <div className="grid grid-cols-4 gap-2 mb-5">
+    <div className="grid grid-cols-4 gap-3 mb-6">
       {[
         { label: "Clients", value: clients.length, icon: "◉", tab: "clients" },
         { label: "Canvas", value: `${canvasItems}`, sub: `${filledBlocks}/9 blocks`, icon: "▣", tab: "canvas" },
         { label: "Experiments", value: experiments.length, icon: "△", tab: "experiments" },
         { label: "Coworkers", value: coworkers.length, sub: gaps > 0 ? `${gaps} gaps` : null, icon: "⚙", tab: "coworkers" },
-      ].map(s => <button key={s.label} onClick={() => setTab(s.tab)} className="bg-zinc-800/50 border border-zinc-800 rounded-xl p-3 text-center hover:border-zinc-700 transition-colors">
-        <div className="text-base text-zinc-500 mb-1">{s.icon}</div>
-        <div className="text-xl font-bold text-zinc-100">{s.value}</div>
-        <div className="text-xs text-zinc-500">{s.label}</div>
-        {s.sub && <div className="text-xs text-amber-500/70 mt-0.5">{s.sub}</div>}
+      ].map(s => <button key={s.label} onClick={() => setTab(s.tab)} className="bg-zinc-800/50 border border-zinc-800 rounded-xl p-4 text-center hover:border-zinc-700 transition-all group">
+        <div className="text-lg text-zinc-500 mb-1.5 group-hover:scale-110 transition-transform">{s.icon}</div>
+        <div className="text-2xl font-bold text-zinc-100 tabular-nums">{s.value}</div>
+        <div className="text-xs text-zinc-500 mt-0.5 font-medium">{s.label}</div>
+        {s.sub && <div className="text-xs text-amber-500/70 mt-1">{s.sub}</div>}
       </button>)}
     </div>
 
-    <div className="mb-5">
-      <div className="flex items-center justify-between mb-2"><h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Business Model Canvas</h3><button onClick={() => setTab("canvas")} className="text-xs text-zinc-600 hover:text-zinc-400">Open canvas →</button></div>
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-3"><h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Business Model Canvas</h3><button onClick={() => setTab("canvas")} className="text-xs text-zinc-600 hover:text-zinc-400 font-medium">Open canvas →</button></div>
       <div className="grid grid-cols-5 gap-1">
         {BMC_BLOCKS.slice(0, 7).map(b => <div key={b.id} className={`p-1.5 rounded text-center ${(canvas[b.id]||[]).length > 0 ? "bg-zinc-800/60 border border-zinc-700/50" : "bg-zinc-900/40 border border-zinc-800/30"}`}>
           <div className="text-xs font-bold text-zinc-500">{b.short}</div>
@@ -435,14 +435,14 @@ function Dashboard({ clients, experiments, decisions, trends, canvas, coworkers,
       </div>
     </div>
 
-    {activeExp.length > 0 && <div className="mb-5">
-      <div className="flex items-center justify-between mb-2"><h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Active Experiments</h3><button onClick={() => setTab("experiments")} className="text-xs text-zinc-600 hover:text-zinc-400">View all →</button></div>
-      <div className="space-y-1.5">{activeExp.slice(0, 3).map(e => <div key={e.id} className="flex items-center justify-between p-2.5 bg-zinc-800/30 rounded-lg border border-zinc-800/50"><p className="text-sm text-zinc-300 truncate flex-1 pr-3">{e.hypothesis}</p><Badge variant={statusBV(e.status)}>{e.status}</Badge></div>)}</div>
+    {activeExp.length > 0 && <div className="mb-6">
+      <div className="flex items-center justify-between mb-3"><h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Active Experiments</h3><button onClick={() => setTab("experiments")} className="text-xs text-zinc-600 hover:text-zinc-400 font-medium">View all →</button></div>
+      <div className="space-y-2">{activeExp.slice(0, 3).map(e => <div key={e.id} className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-lg border border-zinc-800/50"><p className="text-sm text-zinc-300 truncate flex-1 pr-3">{e.hypothesis}</p><Badge variant={statusBV(e.status)}>{e.status}</Badge></div>)}</div>
     </div>}
 
-    {recentNotes.length > 0 && <div className="mb-5">
-      <div className="flex items-center justify-between mb-2"><h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Recent Client Notes</h3><button onClick={() => setTab("clients")} className="text-xs text-zinc-600 hover:text-zinc-400">View all →</button></div>
-      <div className="space-y-1.5">{recentNotes.map((n, i) => <div key={i} className="p-2.5 bg-zinc-800/30 rounded-lg border border-zinc-800/50"><div className="flex items-center justify-between mb-0.5"><span className="text-xs font-medium text-zinc-400">{n.clientName}</span><span className="text-xs text-zinc-700">{formatDate(n.date)}</span></div><p className="text-sm text-zinc-500 truncate">{n.content}</p></div>)}</div>
+    {recentNotes.length > 0 && <div className="mb-6">
+      <div className="flex items-center justify-between mb-3"><h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Recent Client Notes</h3><button onClick={() => setTab("clients")} className="text-xs text-zinc-600 hover:text-zinc-400 font-medium">View all →</button></div>
+      <div className="space-y-2">{recentNotes.map((n, i) => <div key={i} className="p-3 bg-zinc-800/30 rounded-lg border border-zinc-800/50"><div className="flex items-center justify-between mb-1"><span className="text-xs font-medium text-zinc-400">{n.clientName}</span><span className="text-xs text-zinc-700">{formatDate(n.date)}</span></div><p className="text-sm text-zinc-500 truncate">{n.content}</p></div>)}</div>
     </div>}
 
     {clients.length === 0 && experiments.length === 0 && <div className="text-center py-8"><p className="text-sm text-zinc-500">Start by filling in the Business Model Canvas and registering your coworkers.</p></div>}
@@ -486,22 +486,22 @@ export default function App() {
   if (loading) return <div data-theme={theme} className="min-h-screen bg-zinc-950 flex items-center justify-center"><div className="text-zinc-500 text-sm">Loading...</div></div>;
 
   return (
-    <div data-theme={theme} className="min-h-screen bg-zinc-950 text-zinc-100 transition-colors duration-200" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+    <div data-theme={theme} className="min-h-screen bg-zinc-950 text-zinc-100" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
       <div className="border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur sticky top-0 z-40">
-        <div className="max-w-3xl mx-auto px-4">
-          <div className="flex items-center justify-between py-3">
-            <div className="flex items-center gap-2"><div className="w-6 h-6 bg-zinc-100 rounded-md flex items-center justify-center"><span className="text-zinc-900 text-xs font-bold">N</span></div><span className="text-sm font-semibold text-zinc-200 tracking-tight">Nouvia Strategist</span></div>
-            <div className="flex items-center gap-1.5">
+        <div className="max-w-3xl mx-auto px-5">
+          <div className="flex items-center justify-between py-3.5">
+            <div className="flex items-center gap-2.5"><div className="w-7 h-7 bg-zinc-100 rounded-lg flex items-center justify-center"><span className="text-zinc-900 text-sm font-bold">N</span></div><span className="text-sm font-semibold text-zinc-200 tracking-tight">Nouvia Strategist</span></div>
+            <div className="flex items-center gap-2">
               <button onClick={toggleTheme} className="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-colors text-sm" title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>{theme === "dark" ? "☀" : "☾"}</button>
-              <button onClick={() => auth.signOut()} className="px-2.5 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-colors text-xs text-zinc-400 hover:text-zinc-300" title="Sign out">Sign out</button>
+              <button onClick={() => auth.signOut()} className="px-3 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-colors text-xs text-zinc-400 hover:text-zinc-300 font-medium" title="Sign out">Sign out</button>
             </div>
           </div>
-          <div className="flex gap-0.5 -mb-px overflow-x-auto">
-            {TABS.map(t => <button key={t.id} onClick={() => setTab(t.id)} className={`px-2.5 py-2 text-xs font-medium whitespace-nowrap border-b-2 transition-colors ${tab === t.id ? "border-zinc-100 text-zinc-100" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}><span className="mr-1">{t.icon}</span>{t.label}</button>)}
+          <div className="flex gap-1 -mb-px overflow-x-auto">
+            {TABS.map(t => <button key={t.id} onClick={() => setTab(t.id)} className={`px-3 py-2.5 text-xs font-medium whitespace-nowrap border-b-2 transition-colors ${tab === t.id ? "border-zinc-100 text-zinc-100" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}><span className="mr-1.5 opacity-70">{t.icon}</span>{t.label}</button>)}
           </div>
         </div>
       </div>
-      <div className={`mx-auto px-4 py-5 ${tab === "canvas" ? "max-w-5xl" : "max-w-3xl"}`}>
+      <div className={`mx-auto px-5 py-6 ${tab === "canvas" ? "max-w-5xl" : "max-w-3xl"}`}>
         {tab === "dashboard" && <Dashboard clients={clients} experiments={experiments} decisions={decisions} trends={trends} canvas={canvas} coworkers={coworkers} setTab={setTab} />}
         {tab === "canvas" && <CanvasTab canvas={canvas} setCanvas={setCanvas} saveCanvas={sv} />}
         {tab === "clients" && <ClientsTab clients={clients} setClients={setClients} saveClients={sc} />}
