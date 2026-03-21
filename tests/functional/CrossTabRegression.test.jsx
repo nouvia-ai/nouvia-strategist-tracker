@@ -10,7 +10,7 @@
  * Token variable RESOLUTION is confirmed by build (all used in style={} objects).
  */
 
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Tab components ──────────────────────────────────────────────────────────
@@ -316,10 +316,10 @@ describe('TEST-020 · WS2 hooks — empty snapshot, no crash', () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it('useIPLibrary returns empty items', () => {
+  it('useIPLibrary returns empty items', async () => {
     const { result } = renderHook(() => useIPLibrary());
+    await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.items).toEqual([]);
-    expect(result.current.loading).toBe(false);
   });
 
   it('useMRR saveEntry calls setDoc without throwing', async () => {
