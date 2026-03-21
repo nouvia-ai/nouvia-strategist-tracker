@@ -53,13 +53,13 @@ async function saveData(key, data) {
 // ─── UI PRIMITIVES ──────────────────────────────
 function Badge({ children, variant = "default" }) {
   const c = {
-    default: "bg-zinc-700 text-zinc-200",
-    blue:    "bg-blue-900/60 text-blue-300",
-    green:   "bg-emerald-900/60 text-emerald-300",
-    amber:   "bg-amber-900/60 text-amber-300",
-    red:     "bg-red-900/60 text-red-300",
-    purple:  "bg-purple-900/60 text-purple-300",
-    cyan:    "bg-cyan-900/60 text-cyan-300",
+    default: "bg-[var(--color-badge-gray-bg)] text-[var(--color-badge-gray-text)]",
+    blue:    "bg-[var(--color-badge-blue-bg)] text-[var(--color-badge-blue-text)]",
+    green:   "bg-[var(--color-badge-green-bg)] text-[var(--color-badge-green-text)]",
+    amber:   "bg-[var(--color-badge-amber-bg)] text-[var(--color-badge-amber-text)]",
+    red:     "bg-[var(--color-badge-red-bg)] text-[var(--color-badge-red-text)]",
+    purple:  "bg-[var(--color-badge-purple-bg)] text-[var(--color-badge-purple-text)]",
+    cyan:    "bg-[var(--color-badge-cyan-bg)] text-[var(--color-badge-cyan-text)]",
   };
   return <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${c[variant]}`}>{children}</span>;
 }
@@ -272,15 +272,15 @@ function DecisionsTab({ decisions, setDecisions, saveDecisions }) {
   const add = (f) => { const u = [...decisions, { ...f, id: uuid() }]; setDecisions(u); saveDecisions(u); setShowForm(false); };
   return (
     <div>
-      <div className="flex items-center justify-between mb-4"><h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Strategic Decisions</h2><Btn small primary onClick={() => setShowForm(true)}>+ Log Decision</Btn></div>
-      {showForm && <div className="mb-4 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50"><DecisionForm onSave={add} onCancel={() => setShowForm(false)} /></div>}
+      <div className="flex items-center justify-between mb-4"><h2 className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Strategic Decisions</h2><Btn small primary onClick={() => setShowForm(true)}>+ Log Decision</Btn></div>
+      {showForm && <div className="mb-4 p-4 rounded-xl border border-[var(--color-border-muted)]" style={{ backgroundColor: "var(--color-bg-overlay)" }}><DecisionForm onSave={add} onCancel={() => setShowForm(false)} /></div>}
       {decisions.length === 0 && !showForm && <EmptyState icon="◆" title="No decisions logged" subtitle="Record decisions and reasoning" />}
       <div className="space-y-2">
         {[...decisions].reverse().map(d => (
-          <div key={d.id} className="p-3 bg-zinc-800/40 rounded-lg border border-zinc-800">
-            <div className="flex items-center justify-between mb-1"><p className="text-sm font-semibold text-zinc-200">{d.topic}</p><span className="text-xs text-zinc-600">{formatDate(d.date)}</span></div>
-            <p className="text-sm text-zinc-300 mb-1">{d.decision}</p>
-            {d.reasoning && <p className="text-xs text-zinc-500 mt-1">{d.reasoning}</p>}
+          <div key={d.id} className="p-3 rounded-lg border border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-elevated)" }}>
+            <div className="flex items-center justify-between mb-1"><p className="text-sm font-semibold text-[var(--color-text-primary)]">{d.topic}</p><span className="text-xs text-[var(--color-text-ghost)]">{formatDate(d.date)}</span></div>
+            <p className="text-sm text-[var(--color-text-secondary)] mb-1">{d.decision}</p>
+            {d.reasoning && <p className="text-xs text-[var(--color-text-subtle)] mt-1">{d.reasoning}</p>}
             <div className="mt-2 flex gap-1 flex-wrap">
               {d.frameworks  && d.frameworks.split(",").map((f, i)  => <Badge key={i}      variant="purple">{f.trim()}</Badge>)}
               {d.canvasBlocks && d.canvasBlocks.split(",").map((b, i) => <Badge key={"c"+i} variant="cyan">{b.trim()}</Badge>)}
@@ -311,15 +311,15 @@ function TrendsTab({ trends, setTrends, saveTrends }) {
   const add = (f) => { const u = [...trends, { ...f, id: uuid() }]; setTrends(u); saveTrends(u); setShowForm(false); };
   return (
     <div>
-      <div className="flex items-center justify-between mb-4"><h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Industry Trends</h2><Btn small primary onClick={() => setShowForm(true)}>+ Log Trend</Btn></div>
-      {showForm && <div className="mb-4 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50"><TrendForm onSave={add} onCancel={() => setShowForm(false)} /></div>}
+      <div className="flex items-center justify-between mb-4"><h2 className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Industry Trends</h2><Btn small primary onClick={() => setShowForm(true)}>+ Log Trend</Btn></div>
+      {showForm && <div className="mb-4 p-4 rounded-xl border border-[var(--color-border-muted)]" style={{ backgroundColor: "var(--color-bg-overlay)" }}><TrendForm onSave={add} onCancel={() => setShowForm(false)} /></div>}
       {trends.length === 0 && !showForm && <EmptyState icon="〜" title="No trends logged" subtitle="Track market signals" />}
       <div className="space-y-2">
         {[...trends].reverse().map(t => (
-          <div key={t.id} className="p-3 bg-zinc-800/40 rounded-lg border border-zinc-800">
-            <div className="flex items-center justify-between mb-1"><p className="text-sm text-zinc-200">{t.observation}</p><span className="text-xs text-zinc-600 flex-shrink-0 ml-2">{formatDate(t.date)}</span></div>
-            {t.implications && <p className="text-xs text-zinc-500 mt-1">→ {t.implications}</p>}
-            {t.source       && <p className="text-xs text-zinc-700 mt-1">Source: {t.source}</p>}
+          <div key={t.id} className="p-3 rounded-lg border border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-elevated)" }}>
+            <div className="flex items-center justify-between mb-1"><p className="text-sm text-[var(--color-text-primary)]">{t.observation}</p><span className="text-xs text-[var(--color-text-ghost)] flex-shrink-0 ml-2">{formatDate(t.date)}</span></div>
+            {t.implications && <p className="text-xs text-[var(--color-text-subtle)] mt-1">→ {t.implications}</p>}
+            {t.source       && <p className="text-xs text-[var(--color-text-ghost)] mt-1">Source: {t.source}</p>}
           </div>
         ))}
       </div>
@@ -443,20 +443,20 @@ function CoworkersPane({ coworkers, setCoworkers, saveCoworkers, canvas }) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs text-zinc-600">{coworkers.length} registered · {coworkers.filter(c => c.status === "Gap").length} gaps</p>
+          <p className="text-xs text-[var(--color-text-ghost)]">{coworkers.length} registered · {coworkers.filter(c => c.status === "Gap").length} gaps</p>
         </div>
         <Btn small primary onClick={() => setShowForm(true)}>+ Register Coworker</Btn>
       </div>
       {canvasActivities.length > 0 && (
-        <div className="mb-4 p-3 bg-zinc-800/30 rounded-lg border border-zinc-800">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Key Activities Coverage</p>
+        <div className="mb-4 p-3 rounded-lg border border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-elevated)" }}>
+          <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">Key Activities Coverage</p>
           <div className="space-y-1">
             {canvasActivities.map((a, i) => {
               const hit = coveredSet.some(ca => a.toLowerCase().includes(ca) || ca.includes(a.toLowerCase()));
               return (
                 <div key={i} className="flex items-center gap-2">
                   <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${hit ? "bg-emerald-500" : "bg-red-500"}`} />
-                  <span className={`text-xs ${hit ? "text-zinc-400" : "text-zinc-300 font-medium"}`}>{a}</span>
+                  <span className={`text-xs ${hit ? "text-[var(--color-text-muted)]" : "text-[var(--color-text-primary)] font-medium"}`}>{a}</span>
                   {!hit && <span className="text-xs text-red-400/70">— gap</span>}
                 </div>
               );
@@ -464,25 +464,25 @@ function CoworkersPane({ coworkers, setCoworkers, saveCoworkers, canvas }) {
           </div>
         </div>
       )}
-      {showForm && <div className="mb-4 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50"><CoworkerForm onSave={add} onCancel={() => setShowForm(false)} /></div>}
+      {showForm && <div className="mb-4 p-4 rounded-xl border border-[var(--color-border-muted)]" style={{ backgroundColor: "var(--color-bg-overlay)" }}><CoworkerForm onSave={add} onCancel={() => setShowForm(false)} /></div>}
       {coworkers.length === 0 && !showForm && <EmptyState icon="⚙" title="No coworkers registered" subtitle="Map your Claude coworkers to the business model" />}
       <div className="space-y-2">
         {coworkers.map(cw => (
-          <div key={cw.id} className="p-3 bg-zinc-800/40 rounded-lg border border-zinc-800">
+          <div key={cw.id} className="p-3 rounded-lg border border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-elevated)" }}>
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-zinc-200">{cw.name}</span>
-                <select className="bg-zinc-800 border border-zinc-700 rounded px-1.5 py-0.5 text-xs text-zinc-400" value={cw.status} onChange={e => updStatus(cw.id, e.target.value)}>{COWORKER_STATUS.map(st => <option key={st}>{st}</option>)}</select>
+                <span className="text-sm font-semibold text-[var(--color-text-primary)]">{cw.name}</span>
+                <select className="bg-[var(--color-bg-overlay)] border border-[var(--color-border-muted)] rounded px-1.5 py-0.5 text-xs text-[var(--color-text-muted)]" value={cw.status} onChange={e => updStatus(cw.id, e.target.value)}>{COWORKER_STATUS.map(st => <option key={st}>{st}</option>)}</select>
               </div>
-              <button onClick={() => remove(cw.id)} className="text-xs text-zinc-700 hover:text-red-400 transition-colors">remove</button>
+              <button onClick={() => remove(cw.id)} className="text-xs text-[var(--color-text-ghost)] hover:text-red-400 transition-colors">remove</button>
             </div>
-            {(cw.purpose || cw.role) && <p className="text-xs text-zinc-400 mb-1">{cw.purpose || cw.role}</p>}
+            {(cw.purpose || cw.role) && <p className="text-xs text-[var(--color-text-muted)] mb-1">{cw.purpose || cw.role}</p>}
             <div className="flex gap-1 flex-wrap mt-1.5">
               <Badge variant={cwStatusBV(cw.status)}>{cw.status}</Badge>
               {toArr(cw.canvasActivities || cw.keyActivities).map((a, i) => <Badge key={i} variant="cyan">{a}</Badge>)}
               {toArr(cw.skills).map((sk, i) => <Badge key={"s"+i} variant="purple">{sk}</Badge>)}
             </div>
-            {cw.notes && <p className="text-xs text-zinc-600 mt-1.5">{cw.notes}</p>}
+            {cw.notes && <p className="text-xs text-[var(--color-text-ghost)] mt-1.5">{cw.notes}</p>}
           </div>
         ))}
       </div>
@@ -518,7 +518,7 @@ function SkillsPane({ skills, setSkills, saveSkills }) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs text-zinc-600">
+          <p className="text-xs text-[var(--color-text-ghost)]">
             {skills.length} registered
             {gaps > 0        ? ` · ${gaps} gaps`             : ""}
             {needsUpdate > 0 ? ` · ${needsUpdate} need update` : ""}
@@ -534,25 +534,25 @@ function SkillsPane({ skills, setSkills, saveSkills }) {
           ))}
         </div>
       )}
-      {showForm && <div className="mb-4 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50"><SkillForm onSave={add} onCancel={() => setShowForm(false)} /></div>}
+      {showForm && <div className="mb-4 p-4 rounded-xl border border-[var(--color-border-muted)]" style={{ backgroundColor: "var(--color-bg-overlay)" }}><SkillForm onSave={add} onCancel={() => setShowForm(false)} /></div>}
       {skills.length === 0 && !showForm && <EmptyState icon="◈" title="No skills registered" subtitle="Register Claude skills (SKILL.md files) and their status" />}
       <div className="space-y-2">
         {skills.map(sk => (
-          <div key={sk.id} className="p-3 bg-zinc-800/40 rounded-lg border border-zinc-800">
+          <div key={sk.id} className="p-3 rounded-lg border border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-elevated)" }}>
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-zinc-200">{sk.name}</span>
-                <select className="bg-zinc-800 border border-zinc-700 rounded px-1.5 py-0.5 text-xs text-zinc-400" value={sk.status} onChange={e => updStatus(sk.id, e.target.value)}>{SKILL_STATUS.map(st => <option key={st}>{st}</option>)}</select>
+                <span className="text-sm font-semibold text-[var(--color-text-primary)]">{sk.name}</span>
+                <select className="bg-[var(--color-bg-overlay)] border border-[var(--color-border-muted)] rounded px-1.5 py-0.5 text-xs text-[var(--color-text-muted)]" value={sk.status} onChange={e => updStatus(sk.id, e.target.value)}>{SKILL_STATUS.map(st => <option key={st}>{st}</option>)}</select>
               </div>
-              <button onClick={() => remove(sk.id)} className="text-xs text-zinc-700 hover:text-red-400 transition-colors">remove</button>
+              <button onClick={() => remove(sk.id)} className="text-xs text-[var(--color-text-ghost)] hover:text-red-400 transition-colors">remove</button>
             </div>
-            {sk.description && <p className="text-xs text-zinc-400 mb-1.5">{sk.description}</p>}
+            {sk.description && <p className="text-xs text-[var(--color-text-muted)] mb-1.5">{sk.description}</p>}
             <div className="flex gap-1 flex-wrap mt-1">
               <Badge variant={cwStatusBV(sk.status)}>{sk.status}</Badge>
               {sk.coworkers && sk.coworkers.split(",").map((c, i) => <Badge key={i} variant="cyan">{c.trim()}</Badge>)}
               {sk.version   && <Badge variant="default">{sk.version}</Badge>}
             </div>
-            {sk.skillFilePath && <p className="text-xs text-zinc-700 mt-1.5 font-mono truncate">{sk.skillFilePath}</p>}
+            {sk.skillFilePath && <p className="text-xs text-[var(--color-text-ghost)] mt-1.5 font-mono truncate">{sk.skillFilePath}</p>}
           </div>
         ))}
       </div>
@@ -588,7 +588,7 @@ function ConnectorsPane({ connectors, setConnectors, saveConnectors }) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs text-zinc-600">
+          <p className="text-xs text-[var(--color-text-ghost)]">
             {connectors.length} registered
             {issues.length > 0 ? ` · ${issues.length} need attention` : ""}
           </p>
@@ -601,26 +601,26 @@ function ConnectorsPane({ connectors, setConnectors, saveConnectors }) {
           {issues.map(c => <p key={c.id} className="text-xs text-amber-300/70">{c.name} — {c.status}</p>)}
         </div>
       )}
-      {showForm && <div className="mb-4 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50"><ConnectorForm onSave={add} onCancel={() => setShowForm(false)} /></div>}
+      {showForm && <div className="mb-4 p-4 rounded-xl border border-[var(--color-border-muted)]" style={{ backgroundColor: "var(--color-bg-overlay)" }}><ConnectorForm onSave={add} onCancel={() => setShowForm(false)} /></div>}
       {connectors.length === 0 && !showForm && <EmptyState icon="⟳" title="No connectors registered" subtitle="Track your MCP server connections and their status" />}
       <div className="space-y-2">
         {connectors.map(cn => (
-          <div key={cn.id} className="p-3 bg-zinc-800/40 rounded-lg border border-zinc-800">
+          <div key={cn.id} className="p-3 rounded-lg border border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-elevated)" }}>
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-zinc-200">{cn.name}</span>
-                <select className="bg-zinc-800 border border-zinc-700 rounded px-1.5 py-0.5 text-xs text-zinc-400" value={cn.status} onChange={e => updStatus(cn.id, e.target.value)}>{CONNECTOR_STATUS.map(st => <option key={st}>{st}</option>)}</select>
+                <span className="text-sm font-semibold text-[var(--color-text-primary)]">{cn.name}</span>
+                <select className="bg-[var(--color-bg-overlay)] border border-[var(--color-border-muted)] rounded px-1.5 py-0.5 text-xs text-[var(--color-text-muted)]" value={cn.status} onChange={e => updStatus(cn.id, e.target.value)}>{CONNECTOR_STATUS.map(st => <option key={st}>{st}</option>)}</select>
               </div>
-              <button onClick={() => remove(cn.id)} className="text-xs text-zinc-700 hover:text-red-400 transition-colors">remove</button>
+              <button onClick={() => remove(cn.id)} className="text-xs text-[var(--color-text-ghost)] hover:text-red-400 transition-colors">remove</button>
             </div>
-            {cn.description && <p className="text-xs text-zinc-400 mb-1.5">{cn.description}</p>}
-            {cn.url         && <p className="text-xs text-zinc-700 font-mono mb-1.5 truncate">{cn.url}</p>}
+            {cn.description && <p className="text-xs text-[var(--color-text-muted)] mb-1.5">{cn.description}</p>}
+            {cn.url         && <p className="text-xs text-[var(--color-text-ghost)] font-mono mb-1.5 truncate">{cn.url}</p>}
             <div className="flex gap-1 flex-wrap mt-1">
               <Badge variant={connStatusBV(cn.status)}>{cn.status}</Badge>
               {cn.toolsCount          && <Badge variant="default">{cn.toolsCount} tools</Badge>}
               {cn.connectedCoworkers  && cn.connectedCoworkers.split(",").map((c, i) => <Badge key={i} variant="cyan">{c.trim()}</Badge>)}
             </div>
-            {cn.lastVerified && <p className="text-xs text-zinc-700 mt-1.5">Last verified: {formatDate(cn.lastVerified)}</p>}
+            {cn.lastVerified && <p className="text-xs text-[var(--color-text-ghost)] mt-1.5">Last verified: {formatDate(cn.lastVerified)}</p>}
           </div>
         ))}
       </div>
@@ -641,11 +641,11 @@ function CoworkersTab({ coworkers, setCoworkers, saveCoworkers, canvas, skills, 
     <div>
       {/* Sub-nav */}
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Coworker Registry</h2>
-        <div className="flex gap-0.5 bg-zinc-800/60 rounded-lg p-0.5">
+        <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Coworker Registry</h2>
+        <div className="flex gap-0.5 rounded-lg p-0.5" style={{ backgroundColor: "var(--color-bg-overlay)" }}>
           {COWORKER_SUB_TABS.map(t => (
             <button key={t.id} onClick={() => setSubTab(t.id)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${subTab === t.id ? "bg-zinc-700 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}>
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${subTab === t.id ? "bg-[var(--color-bg-sunken)] text-[var(--color-text-primary)]" : "text-[var(--color-text-subtle)] hover:text-[var(--color-text-secondary)]"}`}>
               <span className="mr-1 opacity-70">{t.icon}</span>{t.label}
             </button>
           ))}
@@ -670,7 +670,7 @@ function Dashboard({ clients, experiments, decisions, trends, canvas, coworkers,
   const recentNotes = [...allNotes].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
   return (
     <div>
-      <div className="mb-8"><h2 className="text-xl font-semibold text-zinc-100 mb-1 tracking-tight">Strategy Dashboard</h2><p className="text-sm text-zinc-500">Your living strategic operating system</p></div>
+      <div className="mb-8"><h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-1 tracking-tight">Strategy Dashboard</h2><p className="text-sm text-[var(--color-text-subtle)]">Your living strategic operating system</p></div>
       {/* Stat cards */}
       <div className="grid grid-cols-4 gap-3 mb-4">
         {[
@@ -679,10 +679,10 @@ function Dashboard({ clients, experiments, decisions, trends, canvas, coworkers,
           { label: "Experiments", value: experiments.length, icon: "△", tab: "experiments" },
           { label: "Coworkers",   value: coworkers.length,   sub: gaps > 0 ? `${gaps} gaps` : null, icon: "⚙", tab: "coworkers" },
         ].map(s => (
-          <button key={s.label} onClick={() => setTab(s.tab)} className="bg-zinc-800/50 border border-zinc-800 rounded-xl p-4 text-center hover:border-zinc-700 transition-all group">
-            <div className="text-lg text-zinc-500 mb-1.5 group-hover:scale-110 transition-transform">{s.icon}</div>
-            <div className="text-2xl font-bold text-zinc-100 tabular-nums">{s.value}</div>
-            <div className="text-xs text-zinc-500 mt-0.5 font-medium">{s.label}</div>
+          <button key={s.label} onClick={() => setTab(s.tab)} className="rounded-xl p-4 text-center border border-[var(--color-border-default)] hover:border-[var(--color-border-muted)] transition-all group" style={{ backgroundColor: "var(--color-bg-elevated)" }}>
+            <div className="text-lg text-[var(--color-text-subtle)] mb-1.5 group-hover:scale-110 transition-transform">{s.icon}</div>
+            <div className="text-2xl font-bold text-[var(--color-text-primary)] tabular-nums">{s.value}</div>
+            <div className="text-xs text-[var(--color-text-subtle)] mt-0.5 font-medium">{s.label}</div>
             {s.sub && <div className="text-xs text-amber-500/70 mt-1">{s.sub}</div>}
           </button>
         ))}
@@ -693,48 +693,48 @@ function Dashboard({ clients, experiments, decisions, trends, canvas, coworkers,
           { label: "Skills",     value: skills.length,     sub: skillGaps  > 0 ? `${skillGaps} gaps`    : "all good", icon: "◈", tab: "coworkers", warn: skillGaps  > 0 },
           { label: "Connectors", value: connectors.length, sub: connIssues > 0 ? `${connIssues} issues` : "all green", icon: "⟳", tab: "coworkers", warn: connIssues > 0 },
         ].map(s => (
-          <button key={s.label} onClick={() => setTab(s.tab)} className="bg-zinc-800/50 border border-zinc-800 rounded-xl p-3 text-center hover:border-zinc-700 transition-all group flex items-center gap-3 px-4">
-            <div className="text-xl text-zinc-500 group-hover:scale-110 transition-transform">{s.icon}</div>
+          <button key={s.label} onClick={() => setTab(s.tab)} className="rounded-xl p-3 text-center border border-[var(--color-border-default)] hover:border-[var(--color-border-muted)] transition-all group flex items-center gap-3 px-4" style={{ backgroundColor: "var(--color-bg-elevated)" }}>
+            <div className="text-xl text-[var(--color-text-subtle)] group-hover:scale-110 transition-transform">{s.icon}</div>
             <div className="text-left">
-              <div className="text-lg font-bold text-zinc-100 tabular-nums leading-tight">{s.value} <span className="text-sm font-medium text-zinc-400">{s.label}</span></div>
-              <div className={`text-xs mt-0.5 ${s.warn ? "text-amber-500/70" : "text-zinc-600"}`}>{s.sub}</div>
+              <div className="text-lg font-bold text-[var(--color-text-primary)] tabular-nums leading-tight">{s.value} <span className="text-sm font-medium text-[var(--color-text-muted)]">{s.label}</span></div>
+              <div className={`text-xs mt-0.5 ${s.warn ? "text-amber-500/70" : "text-[var(--color-text-ghost)]"}`}>{s.sub}</div>
             </div>
           </button>
         ))}
       </div>
       {/* Canvas mini-map */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-3"><h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Business Model Canvas</h3><button onClick={() => setTab("canvas")} className="text-xs text-zinc-600 hover:text-zinc-400 font-medium">Open canvas →</button></div>
+        <div className="flex items-center justify-between mb-3"><h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-widest">Business Model Canvas</h3><button onClick={() => setTab("canvas")} className="text-xs text-[var(--color-text-ghost)] hover:text-[var(--color-text-muted)] font-medium">Open canvas →</button></div>
         <div className="grid grid-cols-5 gap-1">
           {BMC_BLOCKS.slice(0, 7).map(b => (
-            <div key={b.id} className={`p-1.5 rounded text-center ${(canvas[b.id]||[]).length > 0 ? "bg-zinc-800/60 border border-zinc-700/50" : "bg-zinc-900/40 border border-zinc-800/30"}`}>
-              <div className="text-xs font-bold text-zinc-500">{b.short}</div>
-              <div className={`text-lg font-bold ${(canvas[b.id]||[]).length > 0 ? "text-zinc-200" : "text-zinc-700"}`}>{(canvas[b.id]||[]).length}</div>
+            <div key={b.id} className="p-1.5 rounded text-center border" style={{ backgroundColor: (canvas[b.id]||[]).length > 0 ? "var(--color-bg-overlay)" : "var(--color-bg-elevated)", borderColor: (canvas[b.id]||[]).length > 0 ? "var(--color-border-muted)" : "var(--color-border-default)" }}>
+              <div className="text-xs font-bold text-[var(--color-text-subtle)]">{b.short}</div>
+              <div className={`text-lg font-bold ${(canvas[b.id]||[]).length > 0 ? "text-[var(--color-text-primary)]" : "text-[var(--color-text-ghost)]"}`}>{(canvas[b.id]||[]).length}</div>
             </div>
           ))}
         </div>
         <div className="grid grid-cols-2 gap-1 mt-1">
           {BMC_BLOCKS.slice(7).map(b => (
-            <div key={b.id} className={`p-1.5 rounded text-center ${(canvas[b.id]||[]).length > 0 ? "bg-zinc-800/60 border border-zinc-700/50" : "bg-zinc-900/40 border border-zinc-800/30"}`}>
-              <div className="text-xs font-bold text-zinc-500">{b.short}</div>
-              <div className={`text-lg font-bold ${(canvas[b.id]||[]).length > 0 ? "text-zinc-200" : "text-zinc-700"}`}>{(canvas[b.id]||[]).length}</div>
+            <div key={b.id} className="p-1.5 rounded text-center border" style={{ backgroundColor: (canvas[b.id]||[]).length > 0 ? "var(--color-bg-overlay)" : "var(--color-bg-elevated)", borderColor: (canvas[b.id]||[]).length > 0 ? "var(--color-border-muted)" : "var(--color-border-default)" }}>
+              <div className="text-xs font-bold text-[var(--color-text-subtle)]">{b.short}</div>
+              <div className={`text-lg font-bold ${(canvas[b.id]||[]).length > 0 ? "text-[var(--color-text-primary)]" : "text-[var(--color-text-ghost)]"}`}>{(canvas[b.id]||[]).length}</div>
             </div>
           ))}
         </div>
       </div>
       {activeExp.length > 0 && (
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-3"><h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Active Experiments</h3><button onClick={() => setTab("experiments")} className="text-xs text-zinc-600 hover:text-zinc-400 font-medium">View all →</button></div>
-          <div className="space-y-2">{activeExp.slice(0, 3).map(e => <div key={e.id} className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-lg border border-zinc-800/50"><p className="text-sm text-zinc-300 truncate flex-1 pr-3">{e.hypothesis}</p><Badge variant={statusBV(e.status)}>{e.status}</Badge></div>)}</div>
+          <div className="flex items-center justify-between mb-3"><h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-widest">Active Experiments</h3><button onClick={() => setTab("experiments")} className="text-xs text-[var(--color-text-ghost)] hover:text-[var(--color-text-muted)] font-medium">View all →</button></div>
+          <div className="space-y-2">{activeExp.slice(0, 3).map(e => <div key={e.id} className="flex items-center justify-between p-3 rounded-lg border border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-elevated)" }}><p className="text-sm text-[var(--color-text-secondary)] truncate flex-1 pr-3">{e.hypothesis}</p><Badge variant={statusBV(e.status)}>{e.status}</Badge></div>)}</div>
         </div>
       )}
       {recentNotes.length > 0 && (
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-3"><h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Recent Client Notes</h3><button onClick={() => setTab("clients")} className="text-xs text-zinc-600 hover:text-zinc-400 font-medium">View all →</button></div>
-          <div className="space-y-2">{recentNotes.map((n, i) => <div key={i} className="p-3 bg-zinc-800/30 rounded-lg border border-zinc-800/50"><div className="flex items-center justify-between mb-1"><span className="text-xs font-medium text-zinc-400">{n.clientName}</span><span className="text-xs text-zinc-700">{formatDate(n.date)}</span></div><p className="text-sm text-zinc-500 truncate">{n.content}</p></div>)}</div>
+          <div className="flex items-center justify-between mb-3"><h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-widest">Recent Client Notes</h3><button onClick={() => setTab("clients")} className="text-xs text-[var(--color-text-ghost)] hover:text-[var(--color-text-muted)] font-medium">View all →</button></div>
+          <div className="space-y-2">{recentNotes.map((n, i) => <div key={i} className="p-3 rounded-lg border border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-elevated)" }}><div className="flex items-center justify-between mb-1"><span className="text-xs font-medium text-[var(--color-text-muted)]">{n.clientName}</span><span className="text-xs text-[var(--color-text-ghost)]">{formatDate(n.date)}</span></div><p className="text-sm text-[var(--color-text-subtle)] truncate">{n.content}</p></div>)}</div>
         </div>
       )}
-      {clients.length === 0 && experiments.length === 0 && <div className="text-center py-8"><p className="text-sm text-zinc-500">Start by filling in the Business Model Canvas and registering your coworkers.</p></div>}
+      {clients.length === 0 && experiments.length === 0 && <div className="text-center py-8"><p className="text-sm text-[var(--color-text-subtle)]">Start by filling in the Business Model Canvas and registering your coworkers.</p></div>}
     </div>
   );
 }
@@ -794,8 +794,8 @@ export default function App() {
   const scn  = useCallback(d => saveData(STORAGE_KEYS.mcp_connectors, d), []);
 
   if (loading) return (
-    <div data-theme={theme} className="min-h-screen bg-zinc-950 flex items-center justify-center">
-      <div className="text-zinc-500 text-sm">Loading...</div>
+    <div data-theme={theme} className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--color-bg-base)" }}>
+      <div className="text-sm" style={{ color: "var(--color-text-subtle)" }}>Loading...</div>
     </div>
   );
 
