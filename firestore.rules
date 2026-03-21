@@ -35,5 +35,34 @@ service cloud.firestore {
       allow read, write: if isBen();
     }
 
+    // ── INT-002 CEO Cockpit collections ─────────────────────────────────────
+    match /goals/{docId} {
+      allow read, write: if isBen();
+    }
+
+    match /client_backlog/{docId} {
+      allow read, write: if isBen();
+    }
+
+    match /weekly_todos/{docId} {
+      allow read, write: if isBen();
+    }
+
+    match /forecast_cache/{docId} {
+      allow read, write: if isBen();
+    }
+
+    match /experiments/{docId} {
+      allow read, write: if isBen();
+    }
+
+    match /trends/{docId} {
+      allow read, write: if isBen();
+    }
+
+    match /decisions/{docId} {
+      allow read, write: if isBen();
+    }
+
   }
 }

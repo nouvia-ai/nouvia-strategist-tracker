@@ -12,16 +12,16 @@
       "collectionGroup": "mrr_entries",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "year",  "order": "ASCENDING" },
-        { "fieldPath": "month", "order": "ASCENDING" }
+        { "fieldPath": "year",  "order": "DESCENDING" },
+        { "fieldPath": "month", "order": "DESCENDING" }
       ]
     },
     {
       "collectionGroup": "okrs",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "year",    "order": "ASCENDING" },
-        { "fieldPath": "quarter", "order": "ASCENDING" }
+        { "fieldPath": "year",    "order": "DESCENDING" },
+        { "fieldPath": "quarter", "order": "DESCENDING" }
       ]
     },
     {
@@ -29,6 +29,14 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "type",   "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "order",  "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "goals",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "order",  "order": "ASCENDING" }
       ]
@@ -53,8 +61,8 @@
       "collectionGroup": "weekly_todos",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "week_start", "order": "DESCENDING" },
-        { "fieldPath": "order",      "order": "ASCENDING"  }
+        { "fieldPath": "week_start", "order": "ASCENDING" },
+        { "fieldPath": "order",      "order": "ASCENDING" }
       ]
     }
   ],

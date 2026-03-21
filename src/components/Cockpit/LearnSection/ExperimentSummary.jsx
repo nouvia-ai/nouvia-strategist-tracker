@@ -2,9 +2,7 @@
  * ExperimentSummary — INT-002 TASK-18
  * Top 3 active experiments + Testing Progress Funnel
  */
-import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { db } from '../../../firebase';
+import { useExperiments } from '../../../hooks/useExperiments';
 
 const FUNNEL_STAGES = ['Hypothesis', 'Testing', 'Validated', 'Invalidated'];
 const STAGE_COLORS  = { Hypothesis: '#718096', Testing: '#F5A623', Validated: '#27AE60', Invalidated: '#E74C3C' };
@@ -31,17 +29,12 @@ function Skeleton() {
 }
 
 export default function ExperimentSummary({ onNavigate }) {
-  const [experiments, setExperiments] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsub = onSnapshot(
-      query(collection(db, 'experiments'), orderBy('created_at', 'desc')),
-      snap => { setExperiments(snap.docs.map(d => ({ id: d.id, ...d.data() }))); setLoading(false); },
-      err  => { console.error('[ExperimentSummary]', err); setLoading(false); }
-    );
-    return unsub;
-  }, []);
+  const { items: rawExperiments, loading } = useExperiments();
+  const experiments = [...rawExperiments].sort((a, b) => {
+    const da = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const db_ = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return db_ - da;
+  });
 
   if (loading) return <Skeleton />;
 

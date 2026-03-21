@@ -2,10 +2,12 @@
  * KeyFindings — INT-002 TASK-17
  * Derived client-side: experiments (Validated/Invalidated, 90d) + trends (30d) + decisions (30d)
  * No new Firestore collection — ADR-02
+ * Experiments read from getData (strategist:experiments blob); trends/decisions from native collections.
  */
 import { useState, useEffect } from 'react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../../firebase';
+import { useExperiments } from '../../../hooks/useExperiments';
 
 const SOURCE_STYLE = {
   Experiment: { color: '#27AE60', bg: '#F0FFF4' },
@@ -33,41 +35,45 @@ function Skeleton() {
 }
 
 export default function KeyFindings() {
-  const [findings, setFindings] = useState([]);
-  const [loading,  setLoading]  = useState(true);
+  const { items: experiments, loading: expLoading } = useExperiments();
+  const [trends,    setTrends]    = useState([]);
+  const [decisions, setDecisions] = useState([]);
+  const [tLoaded,   setTLoaded]   = useState(false);
+  const [dLoaded,   setDLoaded]   = useState(false);
 
   useEffect(() => {
-    let loaded = 0;
-    let experiments = [], trends = [], decisions = [];
-
-    const check = () => {
-      if (++loaded < 3) return;
-      const results = [
-        ...experiments
-          .filter(e => ['Validated','Invalidated'].includes(e.status) && isWithin(e.updated_at, 90))
-          .map(e => ({ text: e.hypothesis, source: 'Experiment', status: e.status, date: e.updated_at })),
-        ...trends
-          .filter(t => isWithin(t.created_at, 30))
-          .map(t => ({ text: t.observation || t.title || t.description, source: 'Trend', date: t.created_at })),
-        ...decisions
-          .filter(d => isWithin(d.created_at, 30))
-          .map(d => ({ text: d.decision || d.title || d.description, source: 'Decision', date: d.created_at })),
-      ].sort((a, b) => {
-        const da = a.date?.toDate ? a.date.toDate() : new Date(a.date || 0);
-        const db_ = b.date?.toDate ? b.date.toDate() : new Date(b.date || 0);
-        return db_ - da;
-      }).slice(0, 5);
-      setFindings(results);
-      setLoading(false);
-    };
-
-    const u1 = onSnapshot(collection(db, 'experiments'), snap => { experiments = snap.docs.map(d => ({ id: d.id, ...d.data() })); check(); });
-    const u2 = onSnapshot(collection(db, 'trends'),      snap => { trends      = snap.docs.map(d => ({ id: d.id, ...d.data() })); check(); });
-    const u3 = onSnapshot(collection(db, 'decisions'),   snap => { decisions   = snap.docs.map(d => ({ id: d.id, ...d.data() })); check(); });
-    return () => { u1(); u2(); u3(); };
+    const u1 = onSnapshot(
+      collection(db, 'trends'),
+      snap => { setTrends(snap.docs.map(d => ({ id: d.id, ...d.data() }))); setTLoaded(true); },
+      ()   => setTLoaded(true)
+    );
+    const u2 = onSnapshot(
+      collection(db, 'decisions'),
+      snap => { setDecisions(snap.docs.map(d => ({ id: d.id, ...d.data() }))); setDLoaded(true); },
+      ()   => setDLoaded(true)
+    );
+    return () => { u1(); u2(); };
   }, []);
 
+  const loading = expLoading || !tLoaded || !dLoaded;
+
   if (loading) return <Skeleton />;
+
+  const findings = [
+    ...experiments
+      .filter(e => ['Validated','Invalidated'].includes(e.status) && isWithin(e.updated_at, 90))
+      .map(e => ({ text: e.hypothesis, source: 'Experiment', status: e.status, date: e.updated_at })),
+    ...trends
+      .filter(t => isWithin(t.created_at, 30))
+      .map(t => ({ text: t.observation || t.title || t.description, source: 'Trend', date: t.created_at })),
+    ...decisions
+      .filter(d => isWithin(d.created_at, 30))
+      .map(d => ({ text: d.decision || d.title || d.description, source: 'Decision', date: d.created_at })),
+  ].sort((a, b) => {
+    const da = a.date?.toDate ? a.date.toDate() : new Date(a.date || 0);
+    const db_ = b.date?.toDate ? b.date.toDate() : new Date(b.date || 0);
+    return db_ - da;
+  }).slice(0, 5);
 
   if (findings.length === 0) {
     return (

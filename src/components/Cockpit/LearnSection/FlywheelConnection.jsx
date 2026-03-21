@@ -5,8 +5,9 @@
  * Dismiss → localStorage
  */
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../firebase';
+import { useExperiments } from '../../../hooks/useExperiments';
 
 const DISMISSED_KEY = 'cockpit:flywheel:dismissed';
 
@@ -19,6 +20,7 @@ function addDismissed(id) {
 }
 
 export default function FlywheelConnection() {
+  const { items: experiments } = useExperiments();
   const [candidate, setCandidate] = useState(null);
   const [dismissed, setDismissed] = useState(false);
   const [accepting, setAccepting] = useState(false);
@@ -27,25 +29,20 @@ export default function FlywheelConnection() {
   useEffect(() => {
     const dismissed_ids = getDismissed();
     const cutoff        = Date.now() - 7 * 86400000;
-
-    const unsub = onSnapshot(collection(db, 'experiments'), snap => {
-      const recent = snap.docs
-        .map(d => ({ id: d.id, ...d.data() }))
-        .filter(e => {
-          if (!['Validated','Invalidated'].includes(e.status)) return false;
-          if (dismissed_ids.includes(e.id)) return false;
-          const updated = e.updated_at?.toDate ? e.updated_at.toDate() : new Date(e.updated_at || 0);
-          return updated.getTime() >= cutoff;
-        })
-        .sort((a, b) => {
-          const da = a.updated_at?.toDate ? a.updated_at.toDate() : new Date(0);
-          const db_ = b.updated_at?.toDate ? b.updated_at.toDate() : new Date(0);
-          return db_ - da;
-        });
-      setCandidate(recent[0] || null);
-    });
-    return unsub;
-  }, []);
+    const recent = experiments
+      .filter(e => {
+        if (!['Validated','Invalidated'].includes(e.status)) return false;
+        if (dismissed_ids.includes(e.id)) return false;
+        const updated = e.updated_at?.toDate ? e.updated_at.toDate() : new Date(e.updated_at || 0);
+        return updated.getTime() >= cutoff;
+      })
+      .sort((a, b) => {
+        const da = a.updated_at?.toDate ? a.updated_at.toDate() : new Date(0);
+        const db_ = b.updated_at?.toDate ? b.updated_at.toDate() : new Date(0);
+        return db_ - da;
+      });
+    setCandidate(recent[0] || null);
+  }, [experiments]);
 
   if (!candidate || dismissed || accepted) return null;
 
