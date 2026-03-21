@@ -1,4 +1,29 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "priority_queue",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status",   "order": "ASCENDING" },
+        { "fieldPath": "priority", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "mrr_entries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "year",  "order": "ASCENDING" },
+        { "fieldPath": "month", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "okrs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "year",    "order": "ASCENDING" },
+        { "fieldPath": "quarter", "order": "ASCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }
