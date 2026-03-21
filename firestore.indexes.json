@@ -23,6 +23,39 @@
         { "fieldPath": "year",    "order": "ASCENDING" },
         { "fieldPath": "quarter", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "goals",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "type",   "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "order",  "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "client_backlog",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status",   "order": "ASCENDING" },
+        { "fieldPath": "priority", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "client_backlog",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "client", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "weekly_todos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "week_start", "order": "DESCENDING" },
+        { "fieldPath": "order",      "order": "ASCENDING"  }
+      ]
     }
   ],
   "fieldOverrides": []

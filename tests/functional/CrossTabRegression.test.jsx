@@ -73,17 +73,7 @@ const SAMPLE_NCC = {
 // ═══════════════════════════════════════════════════════════════════════════
 describe('TEST-017 · Tab render — no crash', () => {
   it('DashboardTab renders', () => {
-    const { container } = render(
-      <DashboardTab
-        clients={[]}
-        experiments={[]}
-        canvas={{}}
-        coworkers={[]}
-        skills={[]}
-        connectors={[]}
-        setTab={vi.fn()}
-      />
-    );
+    const { container } = render(<DashboardTab setTab={vi.fn()} />);
     expect(container.firstChild).not.toBeNull();
   });
 
@@ -147,37 +137,16 @@ describe('TEST-017 · Tab render — no crash', () => {
 // TEST-018 · No blank screens — key content present per component
 // ═══════════════════════════════════════════════════════════════════════════
 describe('TEST-018 · No blank screens — key content present', () => {
-  it('DashboardTab shows "Strategy Dashboard" heading', () => {
-    render(
-      <DashboardTab
-        clients={[]}
-        experiments={[]}
-        canvas={{}}
-        coworkers={[]}
-        skills={[]}
-        connectors={[]}
-        setTab={vi.fn()}
-      />
-    );
-    expect(screen.getByText('Strategy Dashboard')).toBeInTheDocument();
+  it('DashboardTab shows MEASURE section heading', () => {
+    render(<DashboardTab setTab={vi.fn()} />);
+    expect(screen.getByText('MEASURE')).toBeInTheDocument();
   });
 
-  it('DashboardTab with data shows client/experiment counts', () => {
-    const clients = [{ id: '1', name: 'IVC', entries: [], adoptionStage: 'Early Adopter' }];
-    const experiments = [{ id: '2', hypothesis: 'Test hyp', status: 'Testing' }];
-    render(
-      <DashboardTab
-        clients={clients}
-        experiments={experiments}
-        canvas={{}}
-        coworkers={[]}
-        skills={[]}
-        connectors={[]}
-        setTab={vi.fn()}
-      />
-    );
-    expect(screen.getAllByText('Clients').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Experiments').length).toBeGreaterThan(0);
+  it('DashboardTab shows all three cockpit sections', () => {
+    render(<DashboardTab setTab={vi.fn()} />);
+    expect(screen.getByText('MEASURE')).toBeInTheDocument();
+    expect(screen.getByText('BUILD')).toBeInTheDocument();
+    expect(screen.getByText('LEARN')).toBeInTheDocument();
   });
 
   it('MRRWidget shows "Monthly Recurring Revenue" label', () => {

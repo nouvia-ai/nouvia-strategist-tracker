@@ -4,8 +4,9 @@ import { auth } from './firebase';
 import Navigation from './components/layout/Navigation';
 import AppShell from './components/layout/AppShell';
 import { useTrackerEvents } from './hooks/useTrackerEvents';
-import IPLibraryTab from './tabs/IPLibraryTab';
-import DashboardTab from './tabs/DashboardTab';
+import IPLibraryTab    from './tabs/IPLibraryTab';
+import DashboardTab    from './tabs/DashboardTab';
+import GoalManagement  from './components/Goals/GoalManagement';
 
 // ─── CONSTANTS ──────────────────────────────────
 const STORAGE_KEYS = {
@@ -830,6 +831,7 @@ export default function App() {
         {tab === "trends"      && <TrendsTab trends={trends} setTrends={setTrends} saveTrends={stv} />}
         {tab === "coworkers"   && <CoworkersTab coworkers={coworkers} setCoworkers={setCoworkers} saveCoworkers={sw} canvas={canvas} skills={skills} setSkills={setSkills} saveSkills={sskl} connectors={connectors} setConnectors={setConnectors} saveConnectors={scn} />}
         {tab === "ip_library"  && <IPLibraryTab />}
+        {tab === "goals"       && <GoalManagement onBack={() => setTab("dashboard")} />}
       </AppShell>
     </div>
   );
