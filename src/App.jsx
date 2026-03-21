@@ -664,7 +664,7 @@ function ConnectorsPane({ connectors, setConnectors, saveConnectors }) {
             <div className="flex gap-1 flex-wrap mt-1">
               <Badge variant={connStatusBV(cn.status)}>{cn.status}</Badge>
               {cn.toolsCount          && <Badge variant="default">{cn.toolsCount} tools</Badge>}
-              {cn.connectedCoworkers  && cn.connectedCoworkers.split(",").map((c, i) => <Badge key={i} variant="cyan">{c.trim()}</Badge>)}
+              {cn.connectedCoworkers  && (Array.isArray(cn.connectedCoworkers) ? cn.connectedCoworkers : cn.connectedCoworkers.split(",")).map((c, i) => <Badge key={i} variant="cyan">{c.trim()}</Badge>)}
             </div>
             {cn.lastVerified && <p className="text-xs text-[var(--color-text-ghost)] mt-1.5">Last verified: {formatDate(cn.lastVerified)}</p>}
           </div>
