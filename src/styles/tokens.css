@@ -1,0 +1,225 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   tokens.css — Nouvia Design Token System (NCC-003)
+   INT-001 Phase 2 · TASK-02
+   All INT-001 components must use var(--token) — no hardcoded values.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* ─── DARK THEME (default) ───────────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+
+  /* ── Colors: Surface ──────────────────────────────────────────────────── */
+  --color-bg-base:        #09090b;   /* zinc-950 — page background          */
+  --color-bg-elevated:    #18181b;   /* zinc-900 — card / panel             */
+  --color-bg-overlay:     #27272a;   /* zinc-800 — input / sub-panel        */
+  --color-bg-sunken:      #3f3f46;   /* zinc-700 — recessed / hover         */
+  --color-bg-header:      rgba(9,9,11,0.90);  /* sticky header              */
+
+  /* ── Colors: Text ────────────────────────────────────────────────────── */
+  --color-text-primary:   #f4f4f5;   /* zinc-100 — headings / values        */
+  --color-text-secondary: #d4d4d8;   /* zinc-300 — body / labels            */
+  --color-text-muted:     #a1a1aa;   /* zinc-400 — captions / meta          */
+  --color-text-subtle:    #71717a;   /* zinc-500 — placeholder / disabled   */
+  --color-text-ghost:     #52525b;   /* zinc-600 — decorative               */
+
+  /* ── Colors: Border ──────────────────────────────────────────────────── */
+  --color-border-default: #27272a;   /* zinc-800                            */
+  --color-border-muted:   #3f3f46;   /* zinc-700                            */
+  --color-border-strong:  #52525b;   /* zinc-600                            */
+
+  /* ── Colors: Accent / Gold ───────────────────────────────────────────── */
+  --color-accent:         #c49a3c;   /* Nouvia gold — nav active, CTAs      */
+  --color-accent-subtle:  rgba(196,154,60,0.08);  /* gold tint background   */
+  --color-accent-muted:   rgba(196,154,60,0.20);  /* hover tint             */
+
+  /* ── Colors: Semantic ────────────────────────────────────────────────── */
+  --color-success:        #34d399;   /* emerald-400                         */
+  --color-success-bg:     rgba(52,211,153,0.10);
+  --color-warning:        #fbbf24;   /* amber-400                           */
+  --color-warning-bg:     rgba(251,191,36,0.10);
+  --color-error:          #f87171;   /* red-400                             */
+  --color-error-bg:       rgba(248,113,113,0.10);
+  --color-info:           #60a5fa;   /* blue-400                            */
+  --color-info-bg:        rgba(96,165,250,0.10);
+
+  /* ── Colors: Status badges ───────────────────────────────────────────── */
+  --color-badge-green-bg:   rgba(16,185,129,0.15);
+  --color-badge-green-text: #34d399;
+  --color-badge-amber-bg:   rgba(251,191,36,0.15);
+  --color-badge-amber-text: #fbbf24;
+  --color-badge-red-bg:     rgba(239,68,68,0.15);
+  --color-badge-red-text:   #f87171;
+  --color-badge-blue-bg:    rgba(96,165,250,0.15);
+  --color-badge-blue-text:  #93c5fd;
+  --color-badge-purple-bg:  rgba(167,139,250,0.15);
+  --color-badge-purple-text:#c4b5fd;
+  --color-badge-cyan-bg:    rgba(34,211,238,0.15);
+  --color-badge-cyan-text:  #67e8f9;
+  --color-badge-gray-bg:    #3f3f46;
+  --color-badge-gray-text:  #d4d4d8;
+
+  /* ── Colors: Interactive ─────────────────────────────────────────────── */
+  --color-btn-primary-bg:   #f4f4f5;   /* zinc-100                         */
+  --color-btn-primary-text: #09090b;   /* zinc-950                         */
+  --color-btn-primary-hover:#ffffff;
+  --color-btn-ghost-bg:     #27272a;
+  --color-btn-ghost-text:   #d4d4d8;
+  --color-btn-ghost-hover:  #3f3f46;
+  --color-input-bg:         #27272a;
+  --color-input-border:     #3f3f46;
+  --color-input-focus:      #71717a;
+  --color-input-text:       #f4f4f5;
+  --color-input-placeholder:#71717a;
+}
+
+/* ─── LIGHT THEME ────────────────────────────────────────────────────────── */
+[data-theme="light"] {
+
+  /* ── Colors: Surface ──────────────────────────────────────────────────── */
+  --color-bg-base:        #f8fafc;   /* slate-50 — page background          */
+  --color-bg-elevated:    #ffffff;   /* white — card / panel                */
+  --color-bg-overlay:     #ffffff;   /* white — input / sub-panel           */
+  --color-bg-sunken:      #f1f5f9;   /* slate-100 — recessed / hover        */
+  --color-bg-header:      rgba(248,250,252,0.92);
+
+  /* ── Colors: Text ────────────────────────────────────────────────────── */
+  --color-text-primary:   #0f172a;   /* slate-900                           */
+  --color-text-secondary: #334155;   /* slate-700                           */
+  --color-text-muted:     #64748b;   /* slate-500                           */
+  --color-text-subtle:    #94a3b8;   /* slate-400                           */
+  --color-text-ghost:     #cbd5e1;   /* slate-300                           */
+
+  /* ── Colors: Border ──────────────────────────────────────────────────── */
+  --color-border-default: #e2e8f0;   /* slate-200                           */
+  --color-border-muted:   #f1f5f9;   /* slate-100                           */
+  --color-border-strong:  #cbd5e1;   /* slate-300                           */
+
+  /* ── Colors: Accent / Gold ───────────────────────────────────────────── */
+  --color-accent:         #b08828;   /* gold — slightly deeper for contrast */
+  --color-accent-subtle:  rgba(176,136,40,0.08);
+  --color-accent-muted:   rgba(176,136,40,0.15);
+
+  /* ── Colors: Semantic ────────────────────────────────────────────────── */
+  --color-success:        #047857;   /* emerald-700                         */
+  --color-success-bg:     #d1fae5;
+  --color-warning:        #b45309;   /* amber-700                           */
+  --color-warning-bg:     #fef3c7;
+  --color-error:          #b91c1c;   /* red-700                             */
+  --color-error-bg:       #fee2e2;
+  --color-info:           #1d4ed8;   /* blue-700                            */
+  --color-info-bg:        #dbeafe;
+
+  /* ── Colors: Status badges ───────────────────────────────────────────── */
+  --color-badge-green-bg:   #d1fae5;
+  --color-badge-green-text: #047857;
+  --color-badge-amber-bg:   #fef3c7;
+  --color-badge-amber-text: #b45309;
+  --color-badge-red-bg:     #fee2e2;
+  --color-badge-red-text:   #b91c1c;
+  --color-badge-blue-bg:    #dbeafe;
+  --color-badge-blue-text:  #1d4ed8;
+  --color-badge-purple-bg:  #ede9fe;
+  --color-badge-purple-text:#6d28d9;
+  --color-badge-cyan-bg:    #cffafe;
+  --color-badge-cyan-text:  #0e7490;
+  --color-badge-gray-bg:    #f1f5f9;
+  --color-badge-gray-text:  #475569;
+
+  /* ── Colors: Interactive ─────────────────────────────────────────────── */
+  --color-btn-primary-bg:   #0f172a;
+  --color-btn-primary-text: #ffffff;
+  --color-btn-primary-hover:#1e293b;
+  --color-btn-ghost-bg:     #f1f5f9;
+  --color-btn-ghost-text:   #334155;
+  --color-btn-ghost-hover:  #e2e8f0;
+  --color-input-bg:         #ffffff;
+  --color-input-border:     #cbd5e1;
+  --color-input-focus:      #64748b;
+  --color-input-text:       #0f172a;
+  --color-input-placeholder:#94a3b8;
+}
+
+/* ─── TYPOGRAPHY ─────────────────────────────────────────────────────────── */
+:root {
+  /* Font families */
+  --font-sans:  "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono:  "JetBrains Mono", "Fira Code", "Menlo", monospace;
+
+  /* Font sizes — 4px base scale */
+  --font-size-xs:   0.75rem;    /* 12px */
+  --font-size-sm:   0.875rem;   /* 14px */
+  --font-size-md:   1rem;       /* 16px */
+  --font-size-lg:   1.125rem;   /* 18px */
+  --font-size-xl:   1.25rem;    /* 20px */
+  --font-size-2xl:  1.5rem;     /* 24px */
+  --font-size-3xl:  1.875rem;   /* 30px */
+
+  /* Font weights */
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* Line heights */
+  --line-height-tight:  1.25;
+  --line-height-snug:   1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed:1.625;
+
+  /* Letter spacing */
+  --letter-spacing-tight:  -0.02em;
+  --letter-spacing-normal:  0em;
+  --letter-spacing-wide:    0.025em;
+  --letter-spacing-wider:   0.05em;
+  --letter-spacing-widest:  0.1em;
+
+/* ─── SPACING ────────────────────────────────────────────────────────────── */
+  /* 4px base scale */
+  --space-0:    0;
+  --space-1:    0.25rem;   /* 4px  */
+  --space-2:    0.5rem;    /* 8px  */
+  --space-3:    0.75rem;   /* 12px */
+  --space-4:    1rem;      /* 16px */
+  --space-5:    1.25rem;   /* 20px */
+  --space-6:    1.5rem;    /* 24px */
+  --space-8:    2rem;      /* 32px */
+  --space-10:   2.5rem;    /* 40px */
+  --space-12:   3rem;      /* 48px */
+  --space-16:   4rem;      /* 64px */
+
+/* ─── BORDER RADIUS ──────────────────────────────────────────────────────── */
+  --radius-sm:  0.25rem;   /* 4px  — tags, badges      */
+  --radius-md:  0.5rem;    /* 8px  — inputs, small cards */
+  --radius-lg:  0.75rem;   /* 12px — cards, panels     */
+  --radius-xl:  1rem;      /* 16px — modals, large cards */
+  --radius-2xl: 1.5rem;    /* 24px — hero sections     */
+  --radius-full:9999px;    /* pills, avatars           */
+
+/* ─── SHADOWS ────────────────────────────────────────────────────────────── */
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md:  0 1px 3px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg:  0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-xl:  0 10px 15px rgba(0,0,0,0.10), 0 4px 6px rgba(0,0,0,0.05);
+  /* Dark-mode card elevations */
+  --shadow-card-dark: 0 1px 2px rgba(0,0,0,0.30), 0 0 0 1px rgba(255,255,255,0.03);
+  --shadow-modal:     0 20px 60px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.05);
+
+/* ─── LAYOUT ─────────────────────────────────────────────────────────────── */
+  --layout-max-content:  48rem;    /* 768px  — narrow reading column       */
+  --layout-max-wide:     64rem;    /* 1024px — standard content            */
+  --layout-max-canvas:   80rem;    /* 1280px — canvas / dashboard          */
+  --layout-max-full:     90rem;    /* 1440px — full-width dashboard        */
+  --layout-nav-width:    56px;     /* collapsed sidebar                    */
+  --layout-header-h:     56px;     /* sticky header height                 */
+  --layout-tap-min:      44px;     /* minimum touch/click target (UX-06)  */
+
+/* ─── ANIMATION ──────────────────────────────────────────────────────────── */
+  --duration-fast:    100ms;
+  --duration-base:    200ms;
+  --duration-slow:    300ms;
+  --duration-slower:  500ms;
+  --ease-default:     cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:          cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:         cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
+}
