@@ -1,9 +1,39 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null
-        && request.auth.token.email == 'benmelchionno@nouvia.ai';
+
+    // ── Helper: single-user gate (INT-001 ADR-P02) ──────────────────────────
+    function isBen() {
+      return request.auth != null
+          && request.auth.token.email == 'benmelchionno@nouvia.ai';
     }
+
+    // ── Existing: per-user data store (getData / setData helpers) ───────────
+    match /users/{userId}/{document=**} {
+      allow read, write: if isBen();
+    }
+
+    // ── INT-001 WS1: IP Library ─────────────────────────────────────────────
+    match /ip_library/{docId} {
+      allow read, write: if isBen();
+    }
+
+    // ── INT-001 WS2: Dashboard collections ─────────────────────────────────
+    match /okrs/{docId} {
+      allow read, write: if isBen();
+    }
+
+    match /mrr_entries/{docId} {
+      allow read, write: if isBen();
+    }
+
+    match /priority_queue/{docId} {
+      allow read, write: if isBen();
+    }
+
+    match /tracker_events/{docId} {
+      allow read, write: if isBen();
+    }
+
   }
 }
