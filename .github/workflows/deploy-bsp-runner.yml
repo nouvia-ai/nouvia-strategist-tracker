@@ -36,10 +36,10 @@ jobs:
       - name: Build and push container
         run: |
           cd services/bsp-loop-runner
-          gcloud builds submit --tag ${{ env.IMAGE }}:${{ github.sha }} --tag ${{ env.IMAGE }}:latest --suppress-logs
+          gcloud builds submit --tag ${{ env.IMAGE }}:latest
 
       - name: Update Cloud Run job
         run: |
           gcloud run jobs update ${{ env.JOB_NAME }} \
             --region=${{ env.REGION }} \
-            --image=${{ env.IMAGE }}:${{ github.sha }}
+            --image=${{ env.IMAGE }}:latest
