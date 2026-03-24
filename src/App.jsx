@@ -119,7 +119,7 @@ const NIP_SECTIONS = [
     id: "cockpit", label: "Management Cockpit", icon: "◈",
     subTabs: [
       { id: "governance", label: "Governance Queue", icon: "▸" },
-      { id: "overview",   label: "Cockpit",          icon: "◈" },
+      { id: "overview",   label: "Dashboard",        icon: "◈" },
     ],
   },
   {
@@ -932,7 +932,7 @@ export default function App() {
         )}
 
         {/* Management Cockpit — Cockpit (overview) sub-tab */}
-        {activeView === "overview" && !nasDetailClient && !riskDetailItem && !channelDetailItem && !channelAdding && <DashboardTab mode="overview" clients={clients} experiments={experiments} canvas={canvas} coworkers={coworkers} skills={skills} connectors={connectors} setTab={setTab} nasProps={{
+        {activeView === "overview" && !nasDetailClient && !riskDetailItem && !channelDetailItem && !channelAdding && <DashboardTab mode="overview" clients={clients} experiments={experiments} canvas={canvas} coworkers={coworkers} skills={skills} connectors={connectors} setTab={setTab} onNavigate={handleNavigate} governancePendingCount={govData.pendingCount} nasProps={{
           scores: nas.scores, configs: nas.configs, aggregateNAS: nas.aggregateNAS,
           loading: nas.loading, updateScore: nas.updateScore, getConfig: nas.getConfig,
           onNavigateToDetail: (score) => setNasDetailClient(score),

@@ -1,8 +1,15 @@
 /**
- * DashboardTab — NIP Phase 6 + Design Audit
+ * DashboardTab — NIP Design Improvement
  * Two modes:
  *   mode="governance" — Governance Queue (Ben's Inbox, action-focused)
- *   mode="overview"   — Cockpit (read-only intelligence overview)
+ *   mode="overview"   — Dashboard (read-only intelligence overview)
+ *
+ * Dashboard layout:
+ *   Row 1: KPI metric tiles (compact horizontal)
+ *   Row 2: Goals+Financials (60%) | NAS (40%)
+ *   Row 3: Risk Intelligence (50%) | Channels (50%)
+ *   Row 4: Build (OKR, Priorities, Todos)
+ *   Row 5: Learn (Flywheel, Findings, Experiments)
  */
 import NorthStarGoal      from '../components/Cockpit/MeasureSection/NorthStarGoal';
 import FinancialMetrics   from '../components/Cockpit/MeasureSection/FinancialMetrics';
@@ -18,100 +25,79 @@ import { RiskSignalsSection } from '../components/Risk/RiskWidget';
 import { ChannelsSection } from '../components/Channels/ChannelsWidget';
 import { GovernanceSection } from '../components/Governance/GovernanceWidget';
 
-/* ── Design tokens (Nouvia Design Standard) ──── */
-const SECTION_GAP  = 'var(--space-8)';   /* 32px between sections */
-const WIDGET_GAP   = 'var(--space-4)';   /* 16px between cards */
-const COL_GAP      = 'var(--space-4)';   /* 16px between columns */
+/* ── Design tokens ───────────────────────────── */
+const S = {
+  sectionGap: 'var(--space-8)',   /* 32px */
+  cardGap:    'var(--space-4)',   /* 16px */
+  cardPad:    'var(--space-6)',   /* 24px */
+  innerGap:   'var(--space-2)',   /* 8px  */
+};
 
-/* ── Section header — Headline role (20-22px) ── */
+const cardStyle = {
+  borderRadius: 'var(--radius-md)',
+  border: '1px solid var(--color-border-default)',
+  backgroundColor: 'var(--color-bg-elevated)',
+  boxShadow: 'var(--shadow-sm)',
+  overflow: 'hidden',
+};
+
+/* ── Section header — Headline role ──────────── */
 function SectionHeader({ label, sub }) {
   return (
     <div style={{ marginBottom: 'var(--space-4)' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
         <h3 style={{
-          margin: 0,
-          fontSize: 'var(--font-size-xl)',
-          fontWeight: 'var(--font-weight-semibold)',
-          color: 'var(--color-text-primary)',
-          fontFamily: 'var(--font-sans)',
-          letterSpacing: 'var(--letter-spacing-tight)',
-        }}>
-          {label}
-        </h3>
-        {sub && (
-          <span style={{
-            fontSize: 'var(--font-size-sm)',
-            color: 'var(--color-text-muted)',
-            fontFamily: 'var(--font-sans)',
-          }}>
-            {sub}
-          </span>
-        )}
+          margin: 0, fontSize: 'var(--font-size-xl)',
+          fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-text-primary)',
+          fontFamily: 'var(--font-sans)', letterSpacing: 'var(--letter-spacing-tight)',
+        }}>{label}</h3>
+        {sub && <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-sans)' }}>{sub}</span>}
       </div>
       <div style={{ height: 1, backgroundColor: 'var(--color-border-default)', marginTop: 'var(--space-2)' }} />
     </div>
   );
 }
 
-/* ── Widget card wrapper ───────────────────────── */
-function WidgetCard({ children, flex }) {
+/* ── KPI Tile — compact metric card ──────────── */
+function KPITile({ value, label, sub, color, onClick }) {
   return (
-    <div style={{ flex: flex || 1, minWidth: 0 }}>
-      {children}
-    </div>
+    <button onClick={onClick} style={{
+      ...cardStyle,
+      flex: 1, minWidth: 0, padding: S.cardPad,
+      cursor: onClick ? 'pointer' : 'default',
+      textAlign: 'left', fontFamily: 'var(--font-sans)',
+      transition: 'box-shadow var(--duration-base) var(--ease-default)',
+    }}
+      onMouseEnter={e => { if (onClick) e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
+    >
+      <div style={{
+        fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-normal)',
+        color: color || 'var(--color-text-primary)', lineHeight: 'var(--line-height-tight)',
+        marginBottom: 'var(--space-1)',
+      }}>{value}</div>
+      <div style={{
+        fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-medium)',
+        color: 'var(--color-text-muted)', textTransform: 'uppercase',
+        letterSpacing: 'var(--letter-spacing-wider)',
+      }}>{label}</div>
+      {sub && <div style={{
+        fontSize: 'var(--font-size-xs)', color: 'var(--color-text-subtle)',
+        marginTop: 2,
+      }}>{sub}</div>}
+    </button>
   );
 }
 
-/* ── Widget label — Label role (12-13px) ──────── */
+/* ── Widget label ────────────────────────────── */
 function WidgetLabel({ children }) {
   return (
     <div style={{
-      fontSize: 'var(--font-size-xs)',
-      fontWeight: 'var(--font-weight-semibold)',
-      color: 'var(--color-text-muted)',
-      textTransform: 'uppercase',
-      letterSpacing: 'var(--letter-spacing-wider)',
-      marginBottom: 'var(--space-2)',
+      fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-semibold)',
+      color: 'var(--color-text-muted)', textTransform: 'uppercase',
+      letterSpacing: 'var(--letter-spacing-wider)', marginBottom: 'var(--space-2)',
       fontFamily: 'var(--font-sans)',
-    }}>
-      {children}
-    </div>
-  );
-}
-
-/* ── Placeholder card ──────────────────────────── */
-function PlaceholderCard({ icon, title, subtitle }) {
-  return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 'var(--space-6)',
-      borderRadius: 'var(--radius-md)',
-      border: '1px dashed var(--color-border-muted)',
-      backgroundColor: 'var(--color-bg-overlay)',
-      flex: 1,
-      minWidth: 0,
-    }}>
-      <div style={{ fontSize: 28, marginBottom: 'var(--space-2)', opacity: 0.4 }}>{icon}</div>
-      <p style={{
-        fontSize: 'var(--font-size-sm)',
-        fontWeight: 'var(--font-weight-medium)',
-        color: 'var(--color-text-muted)',
-        margin: 0,
-        marginBottom: 'var(--space-1)',
-      }}>
-        {title}
-      </p>
-      <p style={{
-        fontSize: 'var(--font-size-xs)',
-        color: 'var(--color-text-subtle)',
-        margin: 0,
-      }}>
-        {subtitle}
-      </p>
-    </div>
+    }}>{children}</div>
   );
 }
 
@@ -127,96 +113,147 @@ function GovernanceView({ governanceProps }) {
 }
 
 /* ══════════════════════════════════════════════════
-   COCKPIT (OVERVIEW) MODE — Read-only intelligence
+   DASHBOARD MODE — Read-only intelligence overview
+   Layout: KPIs → Goals+NAS → Risks+Channels → Build → Learn
    ═══════════════════════════════════════════════ */
-function CockpitView({ setTab, nasProps, riskProps, channelsProps }) {
+function DashboardView({ setTab, onNavigate, nasProps, riskProps, channelsProps, governancePendingCount }) {
   const handleGoToGoals       = () => setTab?.('goals');
   const handleGoToExperiments = () => setTab?.('experiments');
 
-  return (
-    <div style={{ fontFamily: 'var(--font-sans)' }}>
+  // Extract summary data for KPI tiles
+  const nasScore = nasProps?.aggregateNAS;
+  const nasStatus = nasScore?.status || 'pending';
+  const nasValue = nasScore?.nas_score != null ? nasScore.nas_score : '—';
+  const nasStatusLabel = nasStatus === 'healthy' ? 'Healthy' : nasStatus === 'on_track' ? 'On Track' : nasStatus === 'at_risk' ? 'At Risk' : nasStatus === 'critical' ? 'Critical' : 'Pending';
+  const nasColor = nasStatus === 'healthy' ? 'var(--color-success)' : nasStatus === 'on_track' ? 'var(--color-warning)' : nasStatus === 'at_risk' ? 'var(--color-warning)' : nasStatus === 'critical' ? 'var(--color-error)' : 'var(--color-text-muted)';
 
-      {/* ══════════ MEASURE ══════════ */}
-      <div style={{ marginBottom: SECTION_GAP }}>
+  const risks = riskProps?.risks || [];
+  const activeRisks = risks.filter(r => r.status === 'active');
+  const highRisks = activeRisks.filter(r => r.severity === 'high' || r.severity === 'critical');
+
+  const govCount = governancePendingCount || 0;
+
+  return (
+    <div style={{ fontFamily: 'var(--font-sans)', maxWidth: 1440, margin: '0 auto' }}>
+
+      {/* ══════════ ROW 1: KPI TILES ══════════ */}
+      <div style={{ display: 'flex', gap: S.cardGap, marginBottom: S.sectionGap }}>
+        <KPITile
+          value={`${nasValue}/100`}
+          label="NAS Score"
+          sub={`\u{2022} ${nasStatusLabel}`}
+          color={nasColor}
+        />
+        <KPITile
+          value={`${activeRisks.length} active`}
+          label="Risk Signals"
+          sub={highRisks.length > 0 ? `${highRisks.length} high severity` : 'No high risks'}
+          color={highRisks.length > 0 ? 'var(--color-error)' : 'var(--color-text-primary)'}
+        />
+        <KPITile
+          value={govCount > 0 ? `${govCount} pending` : '\u2705'}
+          label="Governance"
+          sub={govCount > 0 ? 'Decisions needed' : 'All clear'}
+          color={govCount > 0 ? 'var(--color-warning)' : 'var(--color-success)'}
+          onClick={govCount > 0 ? () => onNavigate?.('cockpit', 'governance') : undefined}
+        />
+      </div>
+
+      {/* ══════════ ROW 2: GOALS+FINANCIALS (60%) | NAS (40%) ══════════ */}
+      <div style={{ marginBottom: S.sectionGap }}>
         <SectionHeader label="Measure" sub="Are we on track?" />
 
-        <div style={{ marginBottom: WIDGET_GAP }}>
-          <NorthStarGoal onAddGoal={handleGoToGoals} />
-        </div>
+        <div style={{ display: 'flex', gap: S.cardGap, alignItems: 'flex-start' }}>
+          {/* Left column — 60% */}
+          <div style={{ flex: '3 1 0', minWidth: 0 }}>
+            <div style={{ marginBottom: S.cardGap }}>
+              <NorthStarGoal onAddGoal={handleGoToGoals} />
+            </div>
+            <div style={{ marginBottom: S.cardGap }}>
+              <FinancialMetrics />
+            </div>
+            <BacklogPipeline />
+          </div>
 
-        <div style={{ marginBottom: WIDGET_GAP }}>
-          <FinancialMetrics />
-        </div>
-      </div>
-
-      {/* ══════════ CLIENT BACKLOG PIPELINE ══════════ */}
-      <div style={{ marginBottom: SECTION_GAP }}>
-        <BacklogPipeline />
-      </div>
-
-      {/* ══════════ INTELLIGENCE ══════════ */}
-      <div style={{ marginBottom: SECTION_GAP }}>
-        <SectionHeader label="Intelligence" sub="Signals & scoring" />
-
-        <div style={{ display: 'flex', gap: COL_GAP, alignItems: 'stretch' }}>
-          {channelsProps ? (
-            <ChannelsSection {...channelsProps} />
-          ) : (
-            <PlaceholderCard icon={"\ud83d\udce1"} title="Channels" subtitle="Loading channels..." />
-          )}
-          {riskProps ? (
-            <RiskSignalsSection {...riskProps} />
-          ) : (
-            <PlaceholderCard icon={"\u26a1"} title="Risk Signals" subtitle="Loading risk data..." />
-          )}
-          {nasProps ? (
-            <NASSection {...nasProps} />
-          ) : (
-            <PlaceholderCard icon={"\ud83d\udcc8"} title="Nouvia Adoption Score" subtitle="Loading adoption data..." />
-          )}
+          {/* Right column — 40% */}
+          <div style={{ flex: '2 1 0', minWidth: 0 }}>
+            {nasProps ? (
+              <NASSection {...nasProps} />
+            ) : (
+              <div style={{ ...cardStyle, padding: S.cardPad, textAlign: 'center', color: 'var(--color-text-subtle)', fontSize: 'var(--font-size-sm)' }}>
+                Loading adoption data...
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* ══════════ BUILD ══════════ */}
-      <div style={{ marginBottom: SECTION_GAP }}>
+      {/* ══════════ ROW 3: RISK (50%) | CHANNELS (50%) ══════════ */}
+      <div style={{ marginBottom: S.sectionGap }}>
+        <SectionHeader label="Intelligence" sub="Signals & reach" />
+
+        <div style={{ display: 'flex', gap: S.cardGap, alignItems: 'flex-start' }}>
+          {/* Left — Risk Intelligence */}
+          <div style={{ flex: '1 1 0', minWidth: 0 }}>
+            {riskProps ? (
+              <RiskSignalsSection {...riskProps} />
+            ) : (
+              <div style={{ ...cardStyle, padding: S.cardPad, textAlign: 'center', color: 'var(--color-text-subtle)', fontSize: 'var(--font-size-sm)' }}>
+                Loading risk data...
+              </div>
+            )}
+          </div>
+
+          {/* Right — Channels */}
+          <div style={{ flex: '1 1 0', minWidth: 0 }}>
+            {channelsProps ? (
+              <ChannelsSection {...channelsProps} />
+            ) : (
+              <div style={{ ...cardStyle, padding: S.cardPad, textAlign: 'center', color: 'var(--color-text-subtle)', fontSize: 'var(--font-size-sm)' }}>
+                Loading channels...
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════ ROW 4: BUILD ══════════ */}
+      <div style={{ marginBottom: S.sectionGap }}>
         <SectionHeader label="Build" sub="What do I do today?" />
 
-        <div style={{ display: 'flex', gap: COL_GAP, alignItems: 'flex-start' }}>
-          <WidgetCard flex="1.2">
+        <div style={{ display: 'flex', gap: S.cardGap, alignItems: 'flex-start' }}>
+          <div style={{ flex: '1.2 1 0', minWidth: 0 }}>
             <WidgetLabel>OKR Progress</WidgetLabel>
             <OKRProgress />
-          </WidgetCard>
-
-          <WidgetCard flex="1.5">
+          </div>
+          <div style={{ flex: '1.5 1 0', minWidth: 0 }}>
             <WidgetLabel>Top Priorities</WidgetLabel>
             <PrioritySequence onNavigate={() => setTab?.('coworkers')} />
-          </WidgetCard>
-
-          <WidgetCard flex="1.2">
+          </div>
+          <div style={{ flex: '1.2 1 0', minWidth: 0 }}>
             <WidgetLabel>This Week</WidgetLabel>
             <WeeklyTodos />
-          </WidgetCard>
+          </div>
         </div>
       </div>
 
-      {/* ══════════ LEARN ══════════ */}
-      <div style={{ marginBottom: SECTION_GAP }}>
+      {/* ══════════ ROW 5: LEARN ══════════ */}
+      <div style={{ marginBottom: S.sectionGap }}>
         <SectionHeader label="Learn" sub="What did we just learn?" />
 
-        <div style={{ marginBottom: WIDGET_GAP }}>
+        <div style={{ marginBottom: S.cardGap }}>
           <FlywheelConnection />
         </div>
 
-        <div style={{ display: 'flex', gap: COL_GAP, alignItems: 'flex-start' }}>
-          <WidgetCard flex="1.2">
+        <div style={{ display: 'flex', gap: S.cardGap, alignItems: 'flex-start' }}>
+          <div style={{ flex: '1.2 1 0', minWidth: 0 }}>
             <WidgetLabel>Key Findings</WidgetLabel>
             <KeyFindings />
-          </WidgetCard>
-
-          <WidgetCard flex="1">
+          </div>
+          <div style={{ flex: '1 1 0', minWidth: 0 }}>
             <WidgetLabel>Experiments</WidgetLabel>
             <ExperimentSummary onNavigate={handleGoToExperiments} />
-          </WidgetCard>
+          </div>
         </div>
       </div>
 
@@ -227,17 +264,19 @@ function CockpitView({ setTab, nasProps, riskProps, channelsProps }) {
 /* ══════════════════════════════════════════════════
    MAIN EXPORT — routes to correct view by mode
    ═══════════════════════════════════════════════ */
-export default function DashboardTab({ mode = "overview", setTab, nasProps, riskProps, channelsProps, governanceProps }) {
+export default function DashboardTab({ mode = "overview", setTab, onNavigate, nasProps, riskProps, channelsProps, governanceProps, governancePendingCount }) {
   if (mode === "governance") {
     return <GovernanceView governanceProps={governanceProps} />;
   }
 
   return (
-    <CockpitView
+    <DashboardView
       setTab={setTab}
+      onNavigate={onNavigate}
       nasProps={nasProps}
       riskProps={riskProps}
       channelsProps={channelsProps}
+      governancePendingCount={governancePendingCount}
     />
   );
 }
