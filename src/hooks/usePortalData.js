@@ -16,7 +16,7 @@ function seedProjects(clientId) {
     {
       client_id: clientId, title: "IVC AI Platform — Phase 1 Floorplan Takeoff",
       description: "Complete AI annotation platform: AI Annotation Engine, Learning Library, Data Layer, Output Generation, Admin Interface, GCP Infrastructure. 84%+ accuracy on floorplan takeoffs.",
-      stage: "accepted", estimated_value_usd: 30000, estimated_delivery: "2026-03-19",
+      stage: "delivered", estimated_value_usd: 30000, estimated_delivery: "2026-03-19",
       delivered_date: "2026-03-19", phase: "Phase 1",
       components: ["AI Annotation Engine", "Learning Library", "Data Layer", "Output Generation", "Admin Interface", "GCP Infrastructure"],
       waiting_on_client: false, waiting_reason: "", notes: "Phase 1 complete. Ready for acceptance.", client_visible: true,
@@ -103,9 +103,9 @@ export function usePortalProjects(clientId) {
         if (parsed.length > 0) { setProjects(parsed); setLoading(false); }
       } catch (e) { /* ignore */ }
     }
-    // Seed if empty or missing managed support update
+    // Force reseed for V2 (delivered Phase 1 in queue)
     const needsReseed = !cached || JSON.parse(cached).length === 0
-      || !JSON.parse(cached).some(p => p.stage === 'accepted');
+      || JSON.parse(cached).some(p => p.title?.includes('Phase 1') && p.stage === 'accepted');
     if (needsReseed) {
       const seeded = seedProjects(clientId);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
