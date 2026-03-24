@@ -14,6 +14,7 @@ import ExperimentSummary  from '../components/Cockpit/LearnSection/ExperimentSum
 import FlywheelConnection from '../components/Cockpit/LearnSection/FlywheelConnection';
 import { NASSection }     from '../components/NAS/NASWidget';
 import { RiskSignalsSection } from '../components/Risk/RiskWidget';
+import { ChannelsSection } from '../components/Channels/ChannelsWidget';
 
 /* ── Layout tokens ──────────────────────────────── */
 const SECTION_GAP  = 'var(--space-6)';
@@ -82,7 +83,7 @@ function PlaceholderCard({ icon, title, subtitle }) {
   );
 }
 
-export default function DashboardTab({ setTab, nasProps, riskProps }) {
+export default function DashboardTab({ setTab, nasProps, riskProps, channelsProps }) {
   const handleGoToGoals      = () => setTab?.('goals');
   const handleGoToExperiments = () => setTab?.('experiments');
 
@@ -114,11 +115,11 @@ export default function DashboardTab({ setTab, nasProps, riskProps }) {
         <SectionHeader label="INTELLIGENCE" sub="Signals & scoring" />
 
         <div style={{ display: 'flex', gap: COL_GAP, alignItems: 'stretch' }}>
-          <PlaceholderCard
-            icon="🛡"
-            title="Governance Queue"
-            subtitle="No items pending governance"
-          />
+          {channelsProps ? (
+            <ChannelsSection {...channelsProps} />
+          ) : (
+            <PlaceholderCard icon="\u{1F4E1}" title="Channels" subtitle="Loading channels..." />
+          )}
           {riskProps ? (
             <RiskSignalsSection {...riskProps} />
           ) : (

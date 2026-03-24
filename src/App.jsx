@@ -12,6 +12,8 @@ import useAdoptionScores from './hooks/useAdoptionScores';
 import { NASDetail, NASEditForm } from './components/NAS/NASWidget';
 import useRiskAssessments from './hooks/useRiskAssessments';
 import { RiskDetail, RiskEditForm } from './components/Risk/RiskWidget';
+import useChannels from './hooks/useChannels';
+import { ChannelDetail, ChannelEditForm } from './components/Channels/ChannelsWidget';
 
 // ─── CONSTANTS ──────────────────────────────────
 const STORAGE_KEYS = {
@@ -784,6 +786,12 @@ export default function App() {
   const [riskDetailItem, setRiskDetailItem] = useState(null);
   const [riskEditing, setRiskEditing]       = useState(false);
 
+  // Channel state
+  const channelData = useChannels();
+  const [channelDetailItem, setChannelDetailItem] = useState(null);
+  const [channelEditing, setChannelEditing]       = useState(false);
+  const [channelAdding, setChannelAdding]         = useState(false);
+
   const toggleTheme = () => {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
@@ -797,6 +805,9 @@ export default function App() {
     setNasEditing(false);
     setRiskDetailItem(null);
     setRiskEditing(false);
+    setChannelDetailItem(null);
+    setChannelEditing(false);
+    setChannelAdding(false);
   };
 
   // Legacy setTab bridge for components that call setTab('goals') etc.
@@ -853,7 +864,7 @@ export default function App() {
   const se   = useCallback(d => saveData(STORAGE_KEYS.experiments,    d), []);
   const sd   = useCallback(d => saveData(STORAGE_KEYS.decisions,      d), []);
   const stv  = useCallback(d => saveData(STORAGE_KEYS.trends,         d), []);
-  const sv   = useCallback(d => saveData(STORAGE_KEYS.canvas,         d), []);
+  const sv   = useCallback(d => { saveData(STORAGE_KEYS.canvas, d); channelData.updateCanvasLastModified(new Date().toISOString()); }, [channelData.updateCanvasLastModified]);
   const sw   = useCallback(d => saveData(STORAGE_KEYS.coworkers,      d), []);
   const sskl = useCallback(d => saveData(STORAGE_KEYS.skills,         d), []);
   const scn  = useCallback(d => saveData(STORAGE_KEYS.mcp_connectors, d), []);
@@ -880,7 +891,7 @@ export default function App() {
     <div data-theme={theme}>
       <AppShell nav={nav} wideContent={activeView === "canvas"}>
         {/* Dashboard */}
-        {activeView === "dashboard" && !nasDetailClient && !riskDetailItem && <DashboardTab clients={clients} experiments={experiments} canvas={canvas} coworkers={coworkers} skills={skills} connectors={connectors} setTab={setTab} nasProps={{
+        {activeView === "dashboard" && !nasDetailClient && !riskDetailItem && !channelDetailItem && !channelAdding && <DashboardTab clients={clients} experiments={experiments} canvas={canvas} coworkers={coworkers} skills={skills} connectors={connectors} setTab={setTab} nasProps={{
           scores: nas.scores, configs: nas.configs, aggregateNAS: nas.aggregateNAS,
           loading: nas.loading, updateScore: nas.updateScore, getConfig: nas.getConfig,
           onNavigateToDetail: (score) => setNasDetailClient(score),
@@ -888,6 +899,11 @@ export default function App() {
           risks: riskData.risks,
           loading: riskData.loading,
           onSelectRisk: (risk) => setRiskDetailItem(risk),
+        }} channelsProps={{
+          channels: channelData.channels,
+          loading: channelData.loading,
+          canvasLastModified: channelData.canvasLastModified,
+          onSelectChannel: (ch) => setChannelDetailItem(ch),
         }} />}
         {activeView === "dashboard" && nasDetailClient && !nasEditing && (
           <NASDetail
@@ -924,6 +940,38 @@ export default function App() {
               setRiskEditing(false);
             }}
             onCancel={() => setRiskEditing(false)}
+          />
+        )}
+        {activeView === "dashboard" && channelDetailItem && !channelEditing && (
+          <ChannelDetail
+            channel={channelDetailItem}
+            canvasLastModified={channelData.canvasLastModified}
+            onBack={() => setChannelDetailItem(null)}
+            onEdit={() => setChannelEditing(true)}
+            onDelete={async () => {
+              await channelData.deleteChannel(channelDetailItem.id);
+              setChannelDetailItem(null);
+            }}
+          />
+        )}
+        {activeView === "dashboard" && channelDetailItem && channelEditing && (
+          <ChannelEditForm
+            channel={channelDetailItem}
+            onSave={async (updates) => {
+              await channelData.updateChannel(channelDetailItem.id, updates);
+              setChannelDetailItem({ ...channelDetailItem, ...updates });
+              setChannelEditing(false);
+            }}
+            onCancel={() => setChannelEditing(false)}
+          />
+        )}
+        {activeView === "dashboard" && channelAdding && (
+          <ChannelEditForm
+            onSave={async (data) => {
+              await channelData.addChannel(data);
+              setChannelAdding(false);
+            }}
+            onCancel={() => setChannelAdding(false)}
           />
         )}
 
