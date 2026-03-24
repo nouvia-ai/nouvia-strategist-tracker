@@ -203,7 +203,7 @@ function PortalProjects({ projects, updateProject, onSubmitRequest }) {
     { key: 'approved',    label: 'Approved',          headerColor: C.primary },
     { key: 'in_progress', label: 'In Progress',       headerColor: C.primary },
     { key: 'delivered',   label: 'Delivered',          headerColor: C.success },
-    { key: 'accepted',    label: 'Accepted',           headerColor: '#047857' },
+    { key: 'accepted',    label: 'Managed Support',     headerColor: '#047857', subtitle: 'Delivered, paid, and actively maintained by Nouvia' },
   ];
 
   const handleSubmitRequest = () => {
@@ -312,6 +312,11 @@ function PortalProjects({ projects, updateProject, onSubmitRequest }) {
                     {fmtValue(colValue)}
                   </div>
                 )}
+                {col.subtitle && (
+                  <div style={{ fontSize: 10, color: C.textMuted, marginTop: 3, fontFamily: font, fontStyle: 'italic', lineHeight: '1.3' }}>
+                    {col.subtitle}
+                  </div>
+                )}
               </div>
 
               {/* Column body */}
@@ -385,8 +390,13 @@ function PortalProjects({ projects, updateProject, onSubmitRequest }) {
                       )}
                       {p.stage === 'delivered' && (
                         <Btn variant="success" onClick={e => { e.stopPropagation(); updateProject(p.title, { stage: 'accepted' }); }} style={{ fontSize: 12, padding: '6px 16px', width: '100%' }}>
-                          Accept Delivery
+                          Accept & Pay
                         </Btn>
+                      )}
+                      {p.stage === 'accepted' && (
+                        <div style={{ marginTop: 4 }}>
+                          <Badge color="#047857" bg="#d1fae5">{"\u2713"} Actively maintained</Badge>
+                        </div>
                       )}
                     </div>
                   ))
@@ -469,7 +479,7 @@ function PortalProjects({ projects, updateProject, onSubmitRequest }) {
             )}
             {detailProject.stage === 'delivered' && (
               <>
-                <Btn variant="success" onClick={() => { updateProject(detailProject.title, { stage: 'accepted' }); setDetailProject(null); }}>Accept Delivery</Btn>
+                <Btn variant="success" onClick={() => { updateProject(detailProject.title, { stage: 'accepted' }); setDetailProject(null); }}>Accept & Pay</Btn>
                 <Btn variant="outline">Request Changes</Btn>
               </>
             )}
