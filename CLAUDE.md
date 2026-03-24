@@ -1,4 +1,4 @@
-# CLAUDE.md — Nouvia Strategy Tracker
+# CLAUDE.md — Nouvia Intelligence Platform (NIP)
 # INT-001 Phase 2 · Session 0 · TASK-00
 
 ## What this is

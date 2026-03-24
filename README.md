@@ -1,16 +1,33 @@
-# React + Vite
+# Nouvia Intelligence Platform (NIP)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The Nouvia Intelligence Platform is a React SPA (Vite + Firebase) that serves as the central operational hub for Nouvia AI.
 
-Currently, two official plugins are available:
+## Architecture
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Four top-level sections:
 
-## React Compiler
+- **Dashboard** — Goals, Financial Summary, Governance Queue, Risk Signals, Adoption Score
+- **BSP** — Business Strategy Process: Canvas, Experiments, Decisions, Trends
+- **Funnel** — Client management and Pipeline tracking
+- **OS** — Operating System: Coworkers, Skills, Connectors, IP Library
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- React 18 + Vite
+- Firebase (Firestore + Hosting + Auth)
+- GCP project: `nouvia-os`
+- Live at: [nouvia-os.web.app](https://nouvia-os.web.app)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Commands
+
+```bash
+npm run dev          # local dev server
+npm run build        # production build
+npm run lint         # ESLint
+npm run preview      # preview production build
+```
+
+## Services
+
+- `services/bsp-loop-runner/` — BSP weekly scan + monthly health (Cloud Run job)
+- `services/sentinel-reporter/` — Platform usage metrics via BigQuery (Cloud Run job)

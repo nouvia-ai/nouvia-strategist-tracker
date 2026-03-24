@@ -1,10 +1,7 @@
 /**
- * DashboardTab — INT-002 CEO Cockpit
- * Three-section vertical stack: MEASURE / CLIENT BACKLOG PIPELINE / BUILD / LEARN
- * UX Contract: 3 core questions answerable by passive scan — zero clicks required.
- *
- * REMOVED (per TASK-10): summary stat cards, canvas mini-map, recent client notes,
- *   skills/connectors status. All remain accessible from their detail tabs.
+ * DashboardTab — NIP Phase 1
+ * Landing page: Goals, Financial Summary, Governance Queue, Risk Signals, Adoption Score
+ * Plus existing BUILD and LEARN sections from the cockpit.
  */
 import NorthStarGoal      from '../components/Cockpit/MeasureSection/NorthStarGoal';
 import FinancialMetrics   from '../components/Cockpit/MeasureSection/FinancialMetrics';
@@ -47,6 +44,42 @@ function WidgetCard({ children, flex }) {
   );
 }
 
+/* ── Placeholder card ──────────────────────────── */
+function PlaceholderCard({ icon, title, subtitle }) {
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 'var(--space-6) var(--space-4)',
+      borderRadius: 'var(--radius-lg)',
+      border: '1px dashed var(--color-border-muted)',
+      backgroundColor: 'var(--color-bg-overlay)',
+      flex: 1,
+      minWidth: 0,
+    }}>
+      <div style={{ fontSize: 28, marginBottom: 'var(--space-2)', opacity: 0.4 }}>{icon}</div>
+      <p style={{
+        fontSize: 'var(--font-size-sm)',
+        fontWeight: 'var(--font-weight-medium)',
+        color: 'var(--color-text-muted)',
+        margin: 0,
+        marginBottom: 4,
+      }}>
+        {title}
+      </p>
+      <p style={{
+        fontSize: 'var(--font-size-xs)',
+        color: 'var(--color-text-subtle)',
+        margin: 0,
+      }}>
+        {subtitle}
+      </p>
+    </div>
+  );
+}
+
 export default function DashboardTab({ setTab }) {
   const handleGoToGoals      = () => setTab?.('goals');
   const handleGoToExperiments = () => setTab?.('experiments');
@@ -69,9 +102,32 @@ export default function DashboardTab({ setTab }) {
         </div>
       </div>
 
-      {/* ══════════ CLIENT BACKLOG PIPELINE (between MEASURE + BUILD) ══════════ */}
+      {/* ══════════ CLIENT BACKLOG PIPELINE ══════════ */}
       <div style={{ marginBottom: SECTION_GAP }}>
         <BacklogPipeline />
+      </div>
+
+      {/* ══════════ INTELLIGENCE ══════════ */}
+      <div style={{ marginBottom: SECTION_GAP }}>
+        <SectionHeader label="INTELLIGENCE" sub="Signals & scoring" />
+
+        <div style={{ display: 'flex', gap: COL_GAP, alignItems: 'stretch' }}>
+          <PlaceholderCard
+            icon="🛡"
+            title="Governance Queue"
+            subtitle="No items pending governance"
+          />
+          <PlaceholderCard
+            icon="⚡"
+            title="Risk Signals"
+            subtitle="Risk Intelligence coming in Phase 4"
+          />
+          <PlaceholderCard
+            icon="📈"
+            title="Nouvia Adoption Score"
+            subtitle="Adoption scoring coming in Phase 3"
+          />
+        </div>
       </div>
 
       {/* ══════════ BUILD ══════════ */}

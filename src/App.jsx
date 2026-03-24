@@ -6,6 +6,7 @@ import AppShell from './components/layout/AppShell';
 import { useTrackerEvents } from './hooks/useTrackerEvents';
 import IPLibraryTab    from './tabs/IPLibraryTab';
 import DashboardTab    from './tabs/DashboardTab';
+import PipelineTab     from './tabs/PipelineTab';
 import GoalManagement  from './components/Goals/GoalManagement';
 
 // ─── CONSTANTS ──────────────────────────────────
@@ -104,16 +105,34 @@ function Btn({ children, primary, onClick, small, className = "" }) {
   return <button onClick={onClick} className={`${base} ${style} transition-colors ${className}`}>{children}</button>;
 }
 
-// ─── TABS ───────────────────────────────────────
-const TABS = [
-  { id: "dashboard",   label: "Dashboard",   icon: "◈" },
-  { id: "canvas",      label: "Canvas",      icon: "▣" },
-  { id: "clients",     label: "Clients",     icon: "◉" },
-  { id: "experiments", label: "Experiments", icon: "△" },
-  { id: "decisions",   label: "Decisions",   icon: "◆" },
-  { id: "trends",      label: "Trends",      icon: "〜" },
-  { id: "coworkers",   label: "Coworkers",   icon: "⚙" },
-  { id: "ip_library",  label: "IP Library",  icon: "◎" },
+// ─── NIP SECTIONS ───────────────────────────────
+const NIP_SECTIONS = [
+  { id: "dashboard", label: "Dashboard", icon: "◈", subTabs: [] },
+  {
+    id: "bsp", label: "BSP", icon: "▣",
+    subTabs: [
+      { id: "canvas",      label: "Canvas",      icon: "▣" },
+      { id: "experiments", label: "Experiments", icon: "△" },
+      { id: "decisions",   label: "Decisions",   icon: "◆" },
+      { id: "trends",      label: "Trends",      icon: "〜" },
+    ],
+  },
+  {
+    id: "funnel", label: "Funnel", icon: "◉",
+    subTabs: [
+      { id: "clients",  label: "Clients",  icon: "◉" },
+      { id: "pipeline", label: "Pipeline", icon: "📊" },
+    ],
+  },
+  {
+    id: "os", label: "OS", icon: "⚙",
+    subTabs: [
+      { id: "coworkers",  label: "Coworkers",  icon: "⚙" },
+      { id: "skills",     label: "Skills",     icon: "◇" },
+      { id: "connectors", label: "Connectors", icon: "◈" },
+      { id: "ip_library", label: "IP Library", icon: "◎" },
+    ],
+  },
 ];
 
 // ─── CLIENTS ────────────────────────────────────
@@ -745,7 +764,8 @@ function Dashboard({ clients, experiments, decisions, trends, canvas, coworkers,
 
 // ─── MAIN APP ───────────────────────────────────
 export default function App() {
-  const [tab, setTab]     = useState("dashboard");
+  const [section, setSection] = useState("dashboard");
+  const [subTab, setSubTab]   = useState(null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState(() => localStorage.getItem("strategist:theme") || "dark");
   const track = useTrackerEvents();
@@ -756,10 +776,27 @@ export default function App() {
     localStorage.setItem("strategist:theme", next);
   };
 
+  const handleNavigate = (sec, sub) => {
+    setSection(sec);
+    setSubTab(sub);
+  };
+
+  // Legacy setTab bridge for components that call setTab('goals') etc.
+  const setTab = (tabId) => {
+    if (tabId === 'goals') { setSection('dashboard'); setSubTab('goals'); return; }
+    if (tabId === 'experiments') { setSection('bsp'); setSubTab('experiments'); return; }
+    if (tabId === 'coworkers') { setSection('os'); setSubTab('coworkers'); return; }
+    // Default: navigate to dashboard
+    setSection('dashboard'); setSubTab(null);
+  };
+
+  // Derive active tab for content rendering
+  const activeView = subTab || section;
+
   // Track tab navigation
   useEffect(() => {
-    track('tab_viewed', { tab });
-  }, [tab, track]);
+    track('tab_viewed', { tab: activeView });
+  }, [activeView, track]);
 
   const [clients,     setClients]     = useState([]);
   const [experiments, setExperiments] = useState([]);
@@ -811,9 +848,10 @@ export default function App() {
 
   const nav = (
     <Navigation
-      tabs={TABS}
-      activeTab={tab}
-      onTabChange={setTab}
+      sections={NIP_SECTIONS}
+      activeSection={section}
+      activeSubTab={subTab}
+      onNavigate={handleNavigate}
       theme={theme}
       onToggleTheme={toggleTheme}
       onSignOut={() => auth.signOut()}
@@ -822,16 +860,28 @@ export default function App() {
 
   return (
     <div data-theme={theme}>
-      <AppShell nav={nav} wideContent={tab === "canvas"}>
-        {tab === "dashboard"   && <DashboardTab clients={clients} experiments={experiments} canvas={canvas} coworkers={coworkers} skills={skills} connectors={connectors} setTab={setTab} />}
-        {tab === "canvas"      && <CanvasTab canvas={canvas} setCanvas={setCanvas} saveCanvas={sv} />}
-        {tab === "clients"     && <ClientsTab clients={clients} setClients={setClients} saveClients={sc} track={track} />}
-        {tab === "experiments" && <ExperimentsTab experiments={experiments} setExperiments={setExperiments} saveExperiments={se} track={track} />}
-        {tab === "decisions"   && <DecisionsTab decisions={decisions} setDecisions={setDecisions} saveDecisions={sd} />}
-        {tab === "trends"      && <TrendsTab trends={trends} setTrends={setTrends} saveTrends={stv} />}
-        {tab === "coworkers"   && <CoworkersTab coworkers={coworkers} setCoworkers={setCoworkers} saveCoworkers={sw} canvas={canvas} skills={skills} setSkills={setSkills} saveSkills={sskl} connectors={connectors} setConnectors={setConnectors} saveConnectors={scn} />}
-        {tab === "ip_library"  && <IPLibraryTab />}
-        {tab === "goals"       && <GoalManagement onBack={() => setTab("dashboard")} />}
+      <AppShell nav={nav} wideContent={activeView === "canvas"}>
+        {/* Dashboard */}
+        {activeView === "dashboard"  && <DashboardTab clients={clients} experiments={experiments} canvas={canvas} coworkers={coworkers} skills={skills} connectors={connectors} setTab={setTab} />}
+
+        {/* BSP sub-tabs */}
+        {activeView === "canvas"      && <CanvasTab canvas={canvas} setCanvas={setCanvas} saveCanvas={sv} />}
+        {activeView === "experiments" && <ExperimentsTab experiments={experiments} setExperiments={setExperiments} saveExperiments={se} track={track} />}
+        {activeView === "decisions"   && <DecisionsTab decisions={decisions} setDecisions={setDecisions} saveDecisions={sd} />}
+        {activeView === "trends"      && <TrendsTab trends={trends} setTrends={setTrends} saveTrends={stv} />}
+
+        {/* Funnel sub-tabs */}
+        {activeView === "clients"     && <ClientsTab clients={clients} setClients={setClients} saveClients={sc} track={track} />}
+        {activeView === "pipeline"    && <PipelineTab />}
+
+        {/* OS sub-tabs */}
+        {activeView === "coworkers"   && <CoworkersPane coworkers={coworkers} setCoworkers={setCoworkers} saveCoworkers={sw} canvas={canvas} />}
+        {activeView === "skills"      && <SkillsPane skills={skills} setSkills={setSkills} saveSkills={sskl} />}
+        {activeView === "connectors"  && <ConnectorsPane connectors={connectors} setConnectors={setConnectors} saveConnectors={scn} />}
+        {activeView === "ip_library"  && <IPLibraryTab />}
+
+        {/* Goals (accessed from Dashboard) */}
+        {activeView === "goals"       && <GoalManagement onBack={() => handleNavigate("dashboard", null)} />}
       </AppShell>
     </div>
   );

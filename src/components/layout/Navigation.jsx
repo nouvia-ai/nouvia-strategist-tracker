@@ -1,10 +1,9 @@
 /**
- * Navigation — INT-001 NCC-004
- * Sticky top nav bar with logo, tab list (8 tabs), theme toggle, sign-out.
- * Active tab uses --color-accent gold border-bottom.
- * Props: tabs, activeTab, onTabChange, theme, onToggleTheme, onSignOut
+ * Navigation — NIP Phase 1
+ * Two-tier nav: top-level sections (Dashboard, BSP, Funnel, OS) + sub-tabs per section.
+ * Props: sections, activeSection, activeSubTab, onNavigate, theme, onToggleTheme, onSignOut
  */
-export default function Navigation({ tabs, activeTab, onTabChange, theme, onToggleTheme, onSignOut }) {
+export default function Navigation({ sections, activeSection, activeSubTab, onNavigate, theme, onToggleTheme, onSignOut }) {
   const bar = {
     position:        "sticky",
     top:             0,
@@ -82,23 +81,25 @@ export default function Navigation({ tabs, activeTab, onTabChange, theme, onTogg
     fontWeight: "var(--font-weight-medium)",
   };
 
-  const tabRow = {
+  const sectionRow = {
     display:    "flex",
     gap:        "var(--space-1)",
     marginBottom: "-1px",
-    overflowX:  "auto",
-    scrollbarWidth: "none",
   };
+
+  const currentSection = sections.find(s => s.id === activeSection);
+  const subTabs = currentSection?.subTabs || [];
 
   return (
     <nav style={bar}>
       <div style={inner}>
+        {/* Top row: logo + actions */}
         <div style={topRow}>
           <div style={logoArea}>
             <div style={logoMark}>
               <span style={{ color: "var(--color-bg-base)", fontSize: "var(--font-size-sm)", fontWeight: "var(--font-weight-bold)" }}>N</span>
             </div>
-            <span style={logoText}>Nouvia Strategist</span>
+            <span style={logoText}>Nouvia Intelligence Platform</span>
           </div>
           <div style={actions}>
             <button
@@ -122,17 +123,18 @@ export default function Navigation({ tabs, activeTab, onTabChange, theme, onTogg
           </div>
         </div>
 
-        <div style={tabRow}>
-          {tabs.map(t => {
-            const active = t.id === activeTab;
+        {/* Section tabs */}
+        <div style={sectionRow}>
+          {sections.map(s => {
+            const active = s.id === activeSection;
             return (
               <button
-                key={t.id}
-                onClick={() => onTabChange(t.id)}
+                key={s.id}
+                onClick={() => onNavigate(s.id, s.subTabs?.[0]?.id || null)}
                 style={{
-                  padding:         "var(--space-2) var(--space-3)",
+                  padding:         "var(--space-2) var(--space-4)",
                   fontSize:        "var(--font-size-xs)",
-                  fontWeight:      "var(--font-weight-medium)",
+                  fontWeight:      active ? "var(--font-weight-semibold)" : "var(--font-weight-medium)",
                   whiteSpace:      "nowrap",
                   border:          "none",
                   borderBottom:    active
@@ -144,6 +146,8 @@ export default function Navigation({ tabs, activeTab, onTabChange, theme, onTogg
                     : "var(--color-text-muted)",
                   cursor:          "pointer",
                   fontFamily:      "var(--font-sans)",
+                  textTransform:   "uppercase",
+                  letterSpacing:   "0.05em",
                   transition:      `color var(--duration-base) var(--ease-default), border-color var(--duration-base) var(--ease-default)`,
                 }}
                 onMouseEnter={e => {
@@ -153,12 +157,61 @@ export default function Navigation({ tabs, activeTab, onTabChange, theme, onTogg
                   if (!active) e.currentTarget.style.color = "var(--color-text-muted)";
                 }}
               >
-                <span style={{ marginRight: "var(--space-1)", opacity: 0.7 }}>{t.icon}</span>
-                {t.label}
+                <span style={{ marginRight: "var(--space-1)", opacity: 0.7 }}>{s.icon}</span>
+                {s.label}
               </button>
             );
           })}
         </div>
+
+        {/* Sub-tabs (if any) */}
+        {subTabs.length > 0 && (
+          <div style={{
+            display:        "flex",
+            gap:            "var(--space-1)",
+            paddingTop:     "var(--space-1)",
+            borderTop:      "1px solid var(--color-border-muted)",
+          }}>
+            {subTabs.map(st => {
+              const active = st.id === activeSubTab;
+              return (
+                <button
+                  key={st.id}
+                  onClick={() => onNavigate(activeSection, st.id)}
+                  style={{
+                    padding:         "var(--space-1) var(--space-3)",
+                    fontSize:        "var(--font-size-xs)",
+                    fontWeight:      "var(--font-weight-medium)",
+                    whiteSpace:      "nowrap",
+                    border:          "none",
+                    borderBottom:    active
+                      ? "2px solid var(--color-accent)"
+                      : "2px solid transparent",
+                    backgroundColor: active
+                      ? "var(--color-bg-overlay)"
+                      : "transparent",
+                    borderRadius:    active ? "var(--radius-sm) var(--radius-sm) 0 0" : "0",
+                    color:           active
+                      ? "var(--color-text-primary)"
+                      : "var(--color-text-muted)",
+                    cursor:          "pointer",
+                    fontFamily:      "var(--font-sans)",
+                    transition:      `color var(--duration-base) var(--ease-default), background-color var(--duration-base) var(--ease-default)`,
+                  }}
+                  onMouseEnter={e => {
+                    if (!active) e.currentTarget.style.color = "var(--color-text-secondary)";
+                  }}
+                  onMouseLeave={e => {
+                    if (!active) e.currentTarget.style.color = "var(--color-text-muted)";
+                  }}
+                >
+                  <span style={{ marginRight: "var(--space-1)", opacity: 0.6 }}>{st.icon}</span>
+                  {st.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     </nav>
   );
