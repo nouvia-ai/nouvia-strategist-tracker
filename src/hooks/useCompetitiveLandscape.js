@@ -33,10 +33,56 @@ export const COMPARISON_STATUS = {
   not_applicable: { label: "N/A", color: "var(--color-text-subtle)", variant: "gray" },
 };
 
+export const MATRIX_CONFIGS = [
+  {
+    id: "market_position",
+    name: "Market Position",
+    x_axis_left: "SMB / Mid-Market",
+    x_axis_right: "Enterprise",
+    y_axis_bottom: "Project Delivery (build & leave)",
+    y_axis_top: "Ongoing Partnership (adopt & evolve)",
+    quadrant_labels: {
+      top_left: "Platform Partners",
+      top_right: "Enterprise Managed Services",
+      bottom_left: "Build Shops",
+      bottom_right: "Systems Integrators",
+    },
+  },
+  {
+    id: "tech_vs_adoption",
+    name: "Technology vs Adoption Focus",
+    x_axis_left: "Generic AI",
+    x_axis_right: "Domain-Specific AI",
+    y_axis_bottom: "Technology Focus",
+    y_axis_top: "Adoption Focus",
+    quadrant_labels: {
+      top_left: "Adoption Generalists",
+      top_right: "Domain Adoption Leaders",
+      bottom_left: "AI Tool Builders",
+      bottom_right: "Vertical Tech Specialists",
+    },
+  },
+];
+
 function buildSeedData() {
   const now = new Date().toISOString();
 
   const competitors = [
+    {
+      id: "nouvia",
+      name: "Nouvia",
+      type: "Direct",
+      is_self: true,
+      description: "AI-native delivery consultancy with self-evolving platform (Nouvia OS). Solo AI-augmented delivery, outcome-based pricing, adoption guarantee.",
+      threat_level: null,
+      key_differentiator: "Self-evolving delivery system, AI coworker chain, adoption guarantee, reusable Core Components",
+      weakness: "Single-person capacity, no brand recognition yet, one client track record",
+      website: "https://nouvia.ai",
+      notes: "",
+      matrix_positions: { market_position: { x: 25, y: 85 } },
+      created_at: now,
+      updated_at: now,
+    },
     {
       id: uuid(),
       name: "Traditional IT Consultancies",
@@ -47,6 +93,7 @@ function buildSeedData() {
       weakness: "Slow delivery, high cost, no self-evolving platform IP, project-based not outcome-based",
       website: null,
       notes: "Nouvia wins on speed, cost, and the self-evolving delivery system. They sell hours; we sell outcomes.",
+      matrix_positions: { market_position: { x: 85, y: 65 } },
       created_at: now,
       updated_at: now,
     },
@@ -60,6 +107,7 @@ function buildSeedData() {
       weakness: "No reusable platform IP, no self-evolving system, no adoption guarantee, rebuild from scratch each engagement",
       website: null,
       notes: "Closest competitive threat. Differentiation is the Nouvia OS (coworkers, skills, core components) and the adoption guarantee.",
+      matrix_positions: { market_position: { x: 35, y: 25 } },
       created_at: now,
       updated_at: now,
     },
@@ -73,6 +121,7 @@ function buildSeedData() {
       weakness: "Not customizable, no AI adaptation, can't handle unique client workflows, one-size-fits-all",
       website: null,
       notes: "IVC considered these before Nouvia. They failed because IVC's workflow is too unique. This is our wedge.",
+      matrix_positions: { market_position: { x: 55, y: 50 } },
       created_at: now,
       updated_at: now,
     },
@@ -86,6 +135,7 @@ function buildSeedData() {
       weakness: "Expensive ($150k+ per hire), slow to build, high failure rate, no cross-client learning",
       website: null,
       notes: "Nouvia's pitch: 'We're your AI team, but we bring cross-industry patterns and a platform that gets smarter with every engagement.'",
+      matrix_positions: { market_position: { x: 30, y: 30 } },
       created_at: now,
       updated_at: now,
     },
@@ -167,7 +217,11 @@ export function useCompetitiveLandscape() {
   useEffect(() => {
     (async () => {
       const data = await getData(STORAGE_KEY);
-      if (!data || !data.competitors || data.competitors.length === 0) {
+      // Reseed if missing matrix_positions (CBM upgrade) or Nouvia self-entry
+      const needsReseed = !data || !data.competitors || data.competitors.length === 0
+        || !data.competitors.find(c => c.is_self)
+        || !data.competitors.some(c => c.matrix_positions);
+      if (needsReseed) {
         const seed = buildSeedData();
         await setData(STORAGE_KEY, seed);
         setCompetitors(seed.competitors);
@@ -224,6 +278,16 @@ export function useCompetitiveLandscape() {
     await save(competitors, matrix, newAnalysis);
   }, [competitors, matrix, analysis, save]);
 
+  const updatePosition = useCallback(async (compId, matrixId, x, y) => {
+    const newComps = competitors.map(c =>
+      c.id === compId
+        ? { ...c, matrix_positions: { ...(c.matrix_positions || {}), [matrixId]: { x, y } }, updated_at: new Date().toISOString() }
+        : c
+    );
+    setCompetitors(newComps);
+    await save(newComps, matrix, analysis);
+  }, [competitors, matrix, analysis, save]);
+
   // Compute gap analysis from matrix
   const gapAnalysis = competitors.length > 0 ? COMPARISON_DIMENSIONS.map(dim => {
     const cells = competitors.map(c => ({
@@ -252,5 +316,6 @@ export function useCompetitiveLandscape() {
     deleteCompetitor,
     updateMatrixCell,
     updateAnalysis,
+    updatePosition,
   };
 }

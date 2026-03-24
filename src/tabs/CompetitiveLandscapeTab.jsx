@@ -1,15 +1,16 @@
 /**
  * CompetitiveLandscapeTab — NIP BSP Section
- * Three views: Competitor Registry, Comparison Matrix, Gap Analysis + SWOT
+ * Four views: CBM (4-quadrant positioning map), Registry, Comparison Matrix, Gap Analysis
  * Includes Add/Edit forms for competitors, matrix cells, and analysis.
  */
-import { useState, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import {
   useCompetitiveLandscape,
   COMPETITOR_TYPES,
   THREAT_LEVELS,
   COMPARISON_DIMENSIONS,
   COMPARISON_STATUS,
+  MATRIX_CONFIGS,
 } from "../hooks/useCompetitiveLandscape";
 
 /* ── Design tokens ───────────────────────────── */
@@ -61,8 +62,156 @@ const TYPE_BADGE = {
   Emerging: { bg: "var(--color-badge-purple-bg)", fg: "var(--color-badge-purple-text)" },
 };
 
+/* ── CBM — 4-Quadrant Positioning Map ──────── */
+function CBMMap({ competitors, activeMatrixId, onUpdatePosition, onSelectCompetitor }) {
+  const svgRef = useRef(null);
+  const [dragging, setDragging] = useState(null);
+  const [tooltip, setTooltip] = useState(null);
+
+  const config = MATRIX_CONFIGS.find(m => m.id === activeMatrixId) || MATRIX_CONFIGS[0];
+
+  // SVG layout
+  const W = 800, H = 600;
+  const PAD = 60; // padding for labels
+  const plotW = W - PAD * 2, plotH = H - PAD * 2;
+
+  const toSvgX = (pct) => PAD + (pct / 100) * plotW;
+  const toSvgY = (pct) => PAD + ((100 - pct) / 100) * plotH; // invert Y
+  const fromSvgX = (sx) => Math.max(0, Math.min(100, Math.round(((sx - PAD) / plotW) * 100)));
+  const fromSvgY = (sy) => Math.max(0, Math.min(100, Math.round(((1 - (sy - PAD) / plotH)) * 100)));
+
+  const getBubbleSize = (c) => {
+    if (c.is_self) return 28;
+    if (c.threat_level === "High") return 22;
+    if (c.threat_level === "Medium") return 18;
+    return 14;
+  };
+
+  const getBubbleColor = (c) => {
+    if (c.is_self) return "#0A84FF";
+    if (c.threat_level === "High") return "var(--color-error)";
+    if (c.threat_level === "Medium") return "var(--color-warning)";
+    return "var(--color-text-subtle)";
+  };
+
+  const handleMouseDown = useCallback((e, comp) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragging(comp.id);
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    if (!dragging || !svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    const x = fromSvgX(sx);
+    const y = fromSvgY(sy);
+    onUpdatePosition(dragging, activeMatrixId, x, y);
+  }, [dragging, activeMatrixId, onUpdatePosition, fromSvgX, fromSvgY]);
+
+  const handleMouseUp = useCallback(() => {
+    setDragging(null);
+  }, []);
+
+  const centerX = PAD + plotW / 2;
+  const centerY = PAD + plotH / 2;
+
+  return (
+    <div style={{ position: "relative", marginBottom: "var(--space-6)" }}>
+      <svg
+        ref={svgRef}
+        viewBox={`0 0 ${W} ${H}`}
+        style={{ width: "100%", maxWidth: W, height: "auto", minHeight: 500, display: "block", margin: "0 auto", cursor: dragging ? "grabbing" : "default" }}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        {/* Background */}
+        <rect x={0} y={0} width={W} height={H} fill="var(--color-bg-elevated)" rx={8} />
+
+        {/* Quadrant fills — very subtle */}
+        <rect x={PAD} y={PAD} width={plotW / 2} height={plotH / 2} fill="var(--color-bg-overlay)" opacity={0.3} />
+        <rect x={centerX} y={PAD} width={plotW / 2} height={plotH / 2} fill="var(--color-bg-base)" opacity={0.15} />
+        <rect x={PAD} y={centerY} width={plotW / 2} height={plotH / 2} fill="var(--color-bg-base)" opacity={0.15} />
+        <rect x={centerX} y={centerY} width={plotW / 2} height={plotH / 2} fill="var(--color-bg-overlay)" opacity={0.3} />
+
+        {/* Grid lines — dashed */}
+        <line x1={centerX} y1={PAD} x2={centerX} y2={PAD + plotH} stroke="var(--color-border-muted)" strokeWidth={1} strokeDasharray="6 4" />
+        <line x1={PAD} y1={centerY} x2={PAD + plotW} y2={centerY} stroke="var(--color-border-muted)" strokeWidth={1} strokeDasharray="6 4" />
+
+        {/* Border */}
+        <rect x={PAD} y={PAD} width={plotW} height={plotH} fill="none" stroke="var(--color-border-default)" strokeWidth={1} rx={4} />
+
+        {/* Quadrant labels */}
+        <text x={PAD + plotW * 0.25} y={PAD + plotH * 0.15} textAnchor="middle" fontSize={13} fill="var(--color-text-ghost)" fontFamily="var(--font-sans)" fontWeight={500}>{config.quadrant_labels.top_left}</text>
+        <text x={PAD + plotW * 0.75} y={PAD + plotH * 0.15} textAnchor="middle" fontSize={13} fill="var(--color-text-ghost)" fontFamily="var(--font-sans)" fontWeight={500}>{config.quadrant_labels.top_right}</text>
+        <text x={PAD + plotW * 0.25} y={PAD + plotH * 0.88} textAnchor="middle" fontSize={13} fill="var(--color-text-ghost)" fontFamily="var(--font-sans)" fontWeight={500}>{config.quadrant_labels.bottom_left}</text>
+        <text x={PAD + plotW * 0.75} y={PAD + plotH * 0.88} textAnchor="middle" fontSize={13} fill="var(--color-text-ghost)" fontFamily="var(--font-sans)" fontWeight={500}>{config.quadrant_labels.bottom_right}</text>
+
+        {/* Axis labels */}
+        <text x={PAD + 4} y={H - 12} fontSize={11} fill="var(--color-text-muted)" fontFamily="var(--font-sans)">{config.x_axis_left}</text>
+        <text x={PAD + plotW} y={H - 12} textAnchor="end" fontSize={11} fill="var(--color-text-muted)" fontFamily="var(--font-sans)">{config.x_axis_right}</text>
+        <text x={12} y={PAD + plotH} fontSize={11} fill="var(--color-text-muted)" fontFamily="var(--font-sans)" transform={`rotate(-90, 12, ${PAD + plotH})`}>{config.y_axis_bottom}</text>
+        <text x={12} y={PAD + 10} fontSize={11} fill="var(--color-text-muted)" fontFamily="var(--font-sans)" transform={`rotate(-90, 12, ${PAD + 10})`}>{config.y_axis_top}</text>
+
+        {/* Bubbles */}
+        {competitors.map(c => {
+          const pos = c.matrix_positions?.[activeMatrixId];
+          if (!pos) return null;
+          const cx = toSvgX(pos.x);
+          const cy = toSvgY(pos.y);
+          const r = getBubbleSize(c);
+          const color = getBubbleColor(c);
+          const isDraggingThis = dragging === c.id;
+
+          return (
+            <g key={c.id}
+              onMouseDown={(e) => handleMouseDown(e, c)}
+              onMouseEnter={() => !dragging && setTooltip({ comp: c, x: cx, y: cy })}
+              onMouseLeave={() => setTooltip(null)}
+              onClick={() => !isDraggingThis && onSelectCompetitor?.(c)}
+              style={{ cursor: isDraggingThis ? "grabbing" : "grab" }}
+            >
+              {/* Glow for Nouvia */}
+              {c.is_self && <circle cx={cx} cy={cy} r={r + 6} fill={color} opacity={0.15} />}
+              {/* Shadow */}
+              <circle cx={cx + 1} cy={cy + 2} r={r} fill="rgba(0,0,0,0.15)" />
+              {/* Bubble */}
+              <circle cx={cx} cy={cy} r={r} fill={color} opacity={0.85} stroke={c.is_self ? color : "none"} strokeWidth={c.is_self ? 2 : 0} />
+              {/* Label */}
+              <text x={cx} y={cy + r + 14} textAnchor="middle" fontSize={11} fontWeight={c.is_self ? 700 : 500} fill="var(--color-text-primary)" fontFamily="var(--font-sans)">
+                {c.name.length > 20 ? c.name.slice(0, 18) + "\u2026" : c.name}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+
+      {/* Tooltip */}
+      {tooltip && (
+        <div style={{
+          position: "absolute", left: "50%", bottom: 8, transform: "translateX(-50%)",
+          padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-md)",
+          backgroundColor: "var(--color-bg-overlay)", border: "1px solid var(--color-border-muted)",
+          boxShadow: "var(--shadow-md)", fontSize: "var(--font-size-xs)", fontFamily: "var(--font-sans)",
+          color: "var(--color-text-primary)", pointerEvents: "none", zIndex: 10,
+          maxWidth: 300, textAlign: "center",
+        }}>
+          <strong>{tooltip.comp.name}</strong>
+          {tooltip.comp.threat_level && <span style={{ color: "var(--color-text-muted)", marginLeft: 6 }}>{tooltip.comp.threat_level} threat</span>}
+          {tooltip.comp.key_differentiator && (
+            <div style={{ color: "var(--color-text-muted)", marginTop: 2 }}>{tooltip.comp.key_differentiator}</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Sub-views ──────────────────────────────── */
 const VIEWS = [
+  { id: "cbm", label: "Positioning Map" },
   { id: "registry", label: "Registry" },
   { id: "matrix", label: "Comparison Matrix" },
   { id: "analysis", label: "Gap Analysis" },
@@ -496,13 +645,17 @@ export default function CompetitiveLandscapeTab() {
   const {
     competitors, matrix, analysis, gapAnalysis, loading,
     addCompetitor, updateCompetitor, deleteCompetitor,
-    updateMatrixCell, updateAnalysis,
+    updateMatrixCell, updateAnalysis, updatePosition,
   } = useCompetitiveLandscape();
-  const [view, setView] = useState("registry");
+  const [view, setView] = useState("cbm");
+  const [activeMatrixId, setActiveMatrixId] = useState("market_position");
 
   if (loading) {
     return <div style={{ padding: 'var(--space-8)', textAlign: "center", color: 'var(--color-text-muted)', fontFamily: 'var(--font-sans)' }}>Loading competitive landscape...</div>;
   }
+
+  // Filter out Nouvia from registry/matrix views (it's only shown on the CBM)
+  const externalCompetitors = competitors.filter(c => !c.is_self);
 
   return (
     <div style={{ fontFamily: 'var(--font-sans)' }}>
@@ -511,6 +664,22 @@ export default function CompetitiveLandscapeTab() {
         <h2 style={{ margin: 0, fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-text-primary)', letterSpacing: 'var(--letter-spacing-tight)' }}>
           Competitive Landscape
         </h2>
+
+        {/* Matrix selector — only shown on CBM view */}
+        {view === "cbm" && (
+          <select
+            value={activeMatrixId}
+            onChange={e => setActiveMatrixId(e.target.value)}
+            style={{
+              fontSize: 'var(--font-size-sm)', padding: 'var(--space-1) var(--space-3)',
+              borderRadius: 'var(--radius-md)', border: '1px solid var(--color-input-border)',
+              backgroundColor: 'var(--color-input-bg)', color: 'var(--color-input-text)',
+              fontFamily: 'var(--font-sans)', outline: "none",
+            }}
+          >
+            {MATRIX_CONFIGS.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+          </select>
+        )}
       </div>
 
       {/* View tabs */}
@@ -531,8 +700,16 @@ export default function CompetitiveLandscapeTab() {
       </div>
 
       {/* Content */}
-      {view === "registry" && <RegistryView competitors={competitors} onAdd={addCompetitor} onEdit={updateCompetitor} onDelete={deleteCompetitor} />}
-      {view === "matrix" && <MatrixView competitors={competitors} matrix={matrix} onUpdateCell={updateMatrixCell} />}
+      {view === "cbm" && (
+        <CBMMap
+          competitors={competitors}
+          activeMatrixId={activeMatrixId}
+          onUpdatePosition={updatePosition}
+          onSelectCompetitor={(c) => { if (!c.is_self) setView("registry"); }}
+        />
+      )}
+      {view === "registry" && <RegistryView competitors={externalCompetitors} onAdd={addCompetitor} onEdit={updateCompetitor} onDelete={deleteCompetitor} />}
+      {view === "matrix" && <MatrixView competitors={externalCompetitors} matrix={matrix} onUpdateCell={updateMatrixCell} />}
       {view === "analysis" && <AnalysisView analysis={analysis} gapAnalysis={gapAnalysis} onUpdateAnalysis={updateAnalysis} />}
     </div>
   );
