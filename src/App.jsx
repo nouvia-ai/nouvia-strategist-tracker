@@ -872,7 +872,7 @@ export default function App() {
 
         {/* Funnel sub-tabs */}
         {activeView === "clients"     && <ClientsTab clients={clients} setClients={setClients} saveClients={sc} track={track} />}
-        {activeView === "pipeline"    && <PipelineTab />}
+        {activeView === "pipeline"    && <PipelineTab clients={clients} />}
 
         {/* OS sub-tabs */}
         {activeView === "coworkers"   && <CoworkersPane coworkers={coworkers} setCoworkers={setCoworkers} saveCoworkers={sw} canvas={canvas} />}
