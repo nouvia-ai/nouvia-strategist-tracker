@@ -8,6 +8,31 @@ service cloud.firestore {
           && request.auth.token.email == 'benmelchionno@nouvia.ai';
     }
 
+    // ── Helper: authenticated user ──────────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // ── Portal: user roles (read own, Ben writes all) ────────────────────────
+    match /portal_users/{userId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow write: if isAuthenticated();
+    }
+
+    // ── Portal: client-facing collections (authenticated users can read/write) ─
+    match /portal_projects/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+    match /portal_activity/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+    match /portal_documents/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+    match /portal_requests/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+
     // ── Existing: per-user data store (getData / setData helpers) ───────────
     match /users/{userId}/{document=**} {
       allow read, write: if isBen();
