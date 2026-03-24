@@ -160,12 +160,20 @@ export default function AuthGate({ children, portalApp }) {
     );
   }
 
-  // Route based on role
+  // Route based on role (admin can preview portal via ?view=portal)
   const contextValue = { user, ...userRole };
+  const urlParams = new URLSearchParams(window.location.search);
+  const forcePortal = urlParams.get('view') === 'portal';
+  const showPortal = userRole.role === 'client' || (userRole.role === 'admin' && forcePortal);
+
+  // When admin previews portal, override context to show as IVC client
+  const portalContext = forcePortal && userRole.role === 'admin'
+    ? { user, ...userRole, client_id: 'ivc', company_name: 'IVC', display_name: userRole.display_name || 'Ben' }
+    : { user, ...userRole };
 
   return (
-    <UserContext.Provider value={contextValue}>
-      {userRole.role === 'client' ? portalApp : children}
+    <UserContext.Provider value={showPortal ? portalContext : contextValue}>
+      {showPortal ? portalApp : children}
     </UserContext.Provider>
   );
 }
