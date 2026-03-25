@@ -41,7 +41,7 @@ function fmtDate(v) {
 }
 
 /* ══════════ DETAIL PANEL — WS4 ══════════ */
-function DetailPanel({ item, onClose, onNoteSaved }) {
+function DetailPanel({ item, onClose, onNoteSaved, onChangeRequest }) {
   const user = useUser();
   const isNouvia = user?.role === 'admin';
   const [noteText, setNoteText] = useState('');
@@ -159,7 +159,7 @@ function DetailPanel({ item, onClose, onNoteSaved }) {
             <p className="text-xs text-amber-700">
               🔒 This item is in progress. Priority and timeline changes require a Change Request.
             </p>
-            <button className="text-amber-600 hover:text-amber-800 text-xs font-medium mt-1">Submit Change Request</button>
+            <button onClick={() => onChangeRequest?.(item)} className="text-amber-600 hover:text-amber-800 text-xs font-medium mt-1">Submit Change Request</button>
           </div>
         )}
       </div>
@@ -511,6 +511,8 @@ export default function BacklogBoard() {
   const [backlog, setBacklog] = useState([]);
   const [loading, setLoading] = useState(true);
   const [detailItem, setDetailItem] = useState(null);
+  const [changeRequestItem, setChangeRequestItem] = useState(null);
+  const [changeRequestText, setChangeRequestText] = useState('');
 
   const loadBacklog = () => {
     setLoading(true);
@@ -669,7 +671,44 @@ export default function BacklogBoard() {
 
       {/* Detail panel */}
       {detailItem && (
-        <DetailPanel item={detailItem} onClose={() => setDetailItem(null)} onNoteSaved={handleNoteSaved} />
+        <DetailPanel item={detailItem} onClose={() => setDetailItem(null)} onNoteSaved={handleNoteSaved}
+          onChangeRequest={(item) => { setChangeRequestItem(item); setChangeRequestText(''); }} />
+      )}
+
+      {/* Change Request modal — ROOT LEVEL, z-50 */}
+      {changeRequestItem && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center" onClick={() => { setChangeRequestItem(null); setChangeRequestText(''); }}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">🔒 This Item is In Progress</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              Changing the timeline or priority of an item already in progress requires a formal change request. Nouvia will review and update the backlog accordingly.
+            </p>
+            <div className="mb-4">
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1 block">What would you like to change?</label>
+              <textarea value={changeRequestText} onChange={e => setChangeRequestText(e.target.value)}
+                placeholder="Describe the change you need..."
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm h-20 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" autoFocus />
+            </div>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => { setChangeRequestItem(null); setChangeRequestText(''); }} className="text-gray-500 hover:text-gray-700 text-sm font-medium">Cancel</button>
+              <button onClick={async () => {
+                if (!changeRequestText.trim()) return;
+                await addBacklogItem('ivc', {
+                  title: `Change Request: ${changeRequestItem.title}`,
+                  description: changeRequestText.trim(),
+                  stage: 'idea', linkedPillar: changeRequestItem.linkedPillar,
+                  estimatedEffort: 'S', isChangeRequest: true,
+                  linkedOriginalId: changeRequestItem.id, priority: 99,
+                });
+                setChangeRequestItem(null); setChangeRequestText('');
+                loadBacklog();
+              }} disabled={!changeRequestText.trim()}
+                className={`bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-600 ${!changeRequestText.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                Submit Change Request
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
