@@ -117,7 +117,7 @@ function Btn({ children, primary, onClick, small, className = "" }) {
 // ─── NIP SECTIONS ───────────────────────────────
 const NIP_SECTIONS = [
   {
-    id: "cockpit", label: "Management Cockpit", icon: "◈",
+    id: "cockpit", label: "Nouvia Studio", icon: "◈",
     subTabs: [
       { id: "governance", label: "Governance Queue", icon: "▸" },
       { id: "overview",   label: "Dashboard",        icon: "◈" },
