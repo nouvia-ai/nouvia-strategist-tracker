@@ -1,18 +1,22 @@
 import { useState, useEffect, useMemo } from 'react';
-import { getBacklog, addBacklogItem, updateBacklogNotes, updateBacklogPriority, updateBacklogTargetDate } from '../../services/clientCockpit';
+import { getBacklog, addBacklogItem, updateBacklogNotes, updateBacklogPriority, updateBacklogTargetDate, moveToManagedSupport } from '../../services/clientCockpit';
 
 const STAGES = [
   { key: 'idea', label: 'Ideas' },
   { key: 'approved', label: 'Approved' },
   { key: 'in_progress', label: 'In Progress' },
   { key: 'done', label: 'Done' },
+  { key: 'managed', label: 'Managed Support' },
 ];
+
+const EFFORT_UNITS = { S: 1, M: 2, L: 4, XL: 8 };
 
 const STAGE_BADGE = {
   done: { cls: 'bg-green-100 text-green-700', label: '✓ DELIVERED' },
   in_progress: { cls: 'bg-blue-100 text-blue-700', label: '🔨 BUILDING' },
   approved: { cls: 'bg-yellow-50 text-yellow-700', label: '✓ APPROVED' },
   idea: { cls: 'bg-gray-100 text-gray-600', label: '💡 IDEA' },
+  managed: { cls: 'bg-purple-100 text-purple-700', label: '⚙ MANAGED' },
 };
 
 const STAGE_BAR = {
@@ -20,6 +24,7 @@ const STAGE_BAR = {
   in_progress: 'bg-blue-200 border-blue-300 text-blue-800',
   approved: 'bg-yellow-100 border-yellow-300 text-yellow-700',
   idea: 'bg-gray-100 border-gray-200 text-gray-500',
+  managed: 'bg-purple-200 border-purple-300 text-purple-800',
 };
 
 function toDate(v) {
@@ -134,6 +139,16 @@ function DetailPanel({ item, onClose, onNoteSaved }) {
             </div>
           </div>
         </div>
+
+        {/* Move to Managed Support (done items) */}
+        {item.stage === 'done' && (
+          <div className="p-4 border-t border-gray-100">
+            <button onClick={async () => { await moveToManagedSupport(item.id); onNoteSaved(item.id, item.notes || ''); onClose(); }}
+              className="bg-purple-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-purple-600 w-full font-medium">
+              Move to Managed Support
+            </button>
+          </div>
+        )}
 
         {/* Lock indicator */}
         {isLocked && (
@@ -411,6 +426,42 @@ export default function BacklogBoard() {
         </div>
       </div>
 
+      {/* Managed Support Summary Card */}
+      {(() => {
+        const managed = backlog.filter(i => i.stage === 'managed');
+        if (managed.length === 0) return null;
+        return (
+          <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-4 mx-6 flex items-center justify-between">
+            <div>
+              <span className="text-purple-700 font-semibold text-sm">⚙ Managed Support</span>
+              <span className="text-sm text-purple-500 ml-2">{managed.length} capabilit{managed.length === 1 ? 'y' : 'ies'} under active management</span>
+            </div>
+            <div className="flex flex-wrap gap-1">{managed.map(m => <span key={m.id} className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full">{m.title.length > 30 ? m.title.slice(0, 30) + '…' : m.title}</span>)}</div>
+          </div>
+        );
+      })()}
+
+      {/* Effort Summary Bar */}
+      {(() => {
+        const active = backlog.filter(i => ['idea', 'approved', 'in_progress'].includes(i.stage));
+        if (active.length === 0) return null;
+        const byEffort = {};
+        let total = 0;
+        active.forEach(i => {
+          const e = i.estimatedEffort || 'M';
+          byEffort[e] = (byEffort[e] || 0) + 1;
+          total += EFFORT_UNITS[e] || 2;
+        });
+        return (
+          <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4 mx-6 flex items-center gap-6">
+            <span className="text-sm font-semibold text-gray-700">Backlog Capacity</span>
+            <div className="flex gap-2">{Object.entries(byEffort).map(([size, count]) => <span key={size} className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">{count} × {size}</span>)}</div>
+            <span className="text-sm font-medium text-gray-700 ml-auto">{total} total units</span>
+            {total > 16 && <span className="text-orange-500 text-xs">⚠ Large backlog — consider phasing</span>}
+          </div>
+        );
+      })()}
+
       {backlog.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 w-full text-center space-y-2">
           <div className="text-3xl">📋</div>
@@ -425,21 +476,23 @@ export default function BacklogBoard() {
               const items = backlog.filter(i => i.stage === stage.key);
               return (
                 <div key={stage.key} className="w-64 shrink-0">
-                  <div className="flex items-center gap-2 mb-3">
-                    {stage.key === 'in_progress' ? (
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 rounded-full bg-blue-500" />
+                  <div className="mb-3">
+                    <div className="flex items-center gap-2">
+                      {stage.key === 'managed' ? (
+                        <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-purple-500" /><span className="text-purple-600 font-semibold text-sm">{stage.label}</span></div>
+                      ) : stage.key === 'in_progress' ? (
+                        <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500" /><span className="text-gray-700 font-semibold text-sm">{stage.label}</span></div>
+                      ) : stage.key === 'idea' ? (
+                        <span className="text-gray-400 font-semibold text-sm">{stage.label}</span>
+                      ) : (
                         <span className="text-gray-700 font-semibold text-sm">{stage.label}</span>
-                      </div>
-                    ) : stage.key === 'idea' ? (
-                      <span className="text-gray-400 font-semibold text-sm">{stage.label}</span>
-                    ) : (
-                      <span className="text-gray-700 font-semibold text-sm">{stage.label}</span>
-                    )}
-                    <span className="bg-gray-200 text-gray-500 text-xs px-2 py-0.5 rounded-full font-medium">{items.length}</span>
+                      )}
+                      <span className="bg-gray-200 text-gray-500 text-xs px-2 py-0.5 rounded-full font-medium">{items.length}</span>
+                    </div>
+                    {stage.key === 'managed' && <div className="text-xs text-gray-400 mt-0.5">Live capabilities under Nouvia management</div>}
                   </div>
 
-                  <div className="bg-gray-100 rounded-xl p-3 min-h-48 space-y-2">
+                  <div className={`${stage.key === 'managed' ? 'bg-purple-50/50' : 'bg-gray-100'} rounded-xl p-3 min-h-48 space-y-2`}>
                     {items.length === 0 ? (
                       <div className="text-center py-6 text-gray-400 text-sm">No items</div>
                     ) : (
@@ -470,6 +523,9 @@ export default function BacklogBoard() {
                                 </span>
                               )}
                             </div>
+                          )}
+                          {item.stage === 'managed' && (
+                            <span className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full">⚙ Managed</span>
                           )}
                         </div>
                       ))

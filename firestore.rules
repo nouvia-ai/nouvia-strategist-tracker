@@ -105,6 +105,9 @@ service cloud.firestore {
     match /ivc_backlog/{docId} {
       allow read, write: if isAuthenticated();
     }
+    match /ivc_audit_log/{docId} {
+      allow read, write: if isAuthenticated();
+    }
 
   }
 }
