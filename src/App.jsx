@@ -9,6 +9,7 @@ import DashboardTab    from './tabs/DashboardTab';
 import PipelineTab     from './tabs/PipelineTab';
 import CompetitiveLandscapeTab from './tabs/CompetitiveLandscapeTab';
 import GoalManagement  from './components/Goals/GoalManagement';
+import NIPArchitecture from './components/Cockpit/Architecture/NIPArchitecture';
 import useAdoptionScores from './hooks/useAdoptionScores';
 import { NASDetail, NASEditForm } from './components/NAS/NASWidget';
 import useRiskAssessments from './hooks/useRiskAssessments';
@@ -121,6 +122,7 @@ const NIP_SECTIONS = [
     subTabs: [
       { id: "governance", label: "Governance Queue", icon: "▸" },
       { id: "overview",   label: "Dashboard",        icon: "◈" },
+      { id: "architecture", label: "Architecture",   icon: "⬡" },
     ],
   },
   {
@@ -1017,6 +1019,9 @@ export default function App() {
             onCancel={() => setChannelAdding(false)}
           />
         )}
+
+        {/* Nouvia Studio — Architecture sub-tab */}
+        {activeView === "architecture" && <NIPArchitecture />}
 
         {/* BSP sub-tabs */}
         {activeView === "canvas"      && <CanvasTab canvas={canvas} setCanvas={setCanvas} saveCanvas={sv} />}
