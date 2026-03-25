@@ -108,6 +108,21 @@ export default function BacklogBoard() {
                               </span>
                             )}
                           </div>
+                          {/* Value badges */}
+                          {(item.value || item.monthlyFee) && (
+                            <div className="flex items-center gap-1 flex-wrap">
+                              {item.value > 0 && (
+                                <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">
+                                  ${Math.round(item.value / 1000)}k
+                                </span>
+                              )}
+                              {item.monthlyFee > 0 && (
+                                <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">
+                                  ${Math.round(item.monthlyFee / 1000)}k/mo
+                                </span>
+                              )}
+                            </div>
+                          )}
                           {item.linkedGoalIds?.length > 0 && (
                             <div className="flex items-center gap-1">
                               <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />

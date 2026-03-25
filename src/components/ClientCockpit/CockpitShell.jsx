@@ -113,11 +113,19 @@ export default function CockpitShell() {
       </nav>
 
       {/* ── MAIN CONTENT ── */}
-      <main className="md:ml-20 mt-16 md:mb-0 mb-16 min-h-screen bg-gray-50">
-        {activeTab === 'command' && <CommandCenter />}
-        {activeTab === 'backlog' && <BacklogBoard />}
-        {activeTab === 'health' && <HealthPanel />}
-        {activeTab === 'investment' && <InvestmentPanel />}
+      <main className="md:ml-20 mt-16 md:mb-0 mb-16 min-h-screen bg-gray-50 flex flex-col">
+        <div className="flex-1">
+          {activeTab === 'command' && <CommandCenter />}
+          {activeTab === 'backlog' && <BacklogBoard />}
+          {activeTab === 'health' && <HealthPanel />}
+          {activeTab === 'investment' && <InvestmentPanel />}
+        </div>
+        <footer className="mt-auto pt-8 pb-6 px-6 border-t border-gray-100 mt-12">
+          <p className="text-xs text-gray-400 text-center">
+            Powered by{' '}
+            <span className="font-medium text-gray-500">Nouvia Intelligence Platform</span>
+          </p>
+        </footer>
       </main>
     </div>
   );

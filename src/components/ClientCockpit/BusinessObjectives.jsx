@@ -5,6 +5,15 @@ export default function BusinessObjectives({ clientId }) {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState({});
+  const [showTooltip, setShowTooltip] = useState(null); // goalId or null
+
+  useEffect(() => {
+    const handleClickOutside = () => setShowTooltip(null);
+    if (showTooltip) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showTooltip]);
 
   useEffect(() => {
     getGoals(clientId).then(g => { setGoals(g); setLoading(false); }).catch(() => setLoading(false));
@@ -53,9 +62,31 @@ export default function BusinessObjectives({ clientId }) {
                 <span className="bg-gray-200 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full">
                   {goal.ownerName || goal.owner}
                 </span>
-                <button className="text-gray-400 hover:text-gray-600 text-sm" title="AI Enablement reflects capabilities delivered by Nouvia. Business Outcome progress depends on adoption, process changes, and conditions outside Nouvia's control.">
-                  ⓘ
-                </button>
+                <div className="relative inline-block">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowTooltip(showTooltip === goal.id ? null : goal.id); }}
+                    className="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium border border-gray-300"
+                    aria-label="About these metrics"
+                  >
+                    ⓘ
+                  </button>
+                  {showTooltip === goal.id && (
+                    <div className="absolute right-0 top-6 z-50 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 shadow-xl leading-relaxed">
+                      <p>
+                        <strong>AI Enablement</strong> reflects capabilities delivered by Nouvia — this is what Nouvia is accountable for.
+                      </p>
+                      <p className="mt-2">
+                        <strong>Business Outcome</strong> progress depends on adoption, process changes, and conditions outside Nouvia's control. Tracked for context only.
+                      </p>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setShowTooltip(null); }}
+                        className="mt-2 text-gray-400 hover:text-white text-xs"
+                      >
+                        Close ✕
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
