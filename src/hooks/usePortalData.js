@@ -1,68 +1,86 @@
 /**
- * usePortalData — Client Portal data hooks
- * Reads from portal_* Firestore collections, filtered by client_id.
- * Seeds IVC demo data on first load.
+ * usePortalData — Client Portal V2-Final data hooks
+ * Commitment lifecycle: Requested → Scoping → Estimated → Approved for Delivery 🔒 → Building 🔒 → Delivered → Managed Support
  */
 import { useState, useEffect, useCallback } from 'react';
-import { collection, query, where, orderBy, onSnapshot, addDoc, updateDoc, doc, getDocs, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase';
 
 const uuid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
-/* ═══════════ SEED DATA ═══════════ */
+// Lock point: items at or past approved_for_delivery are locked
+const LOCKED_STAGES = ['approved_for_delivery', 'building', 'delivered', 'managed_support'];
+export const isLocked = (stage) => LOCKED_STAGES.includes(stage);
+
+/* ═══════════ SEED DATA (V2-Final) ═══════════ */
 function seedProjects(clientId) {
   const now = new Date().toISOString();
   return [
     {
-      client_id: clientId, title: "IVC AI Platform — Phase 1 Floorplan Takeoff",
+      id: uuid(), client_id: clientId,
+      title: "IVC AI Platform — Phase 1 Floorplan Takeoff",
       description: "Complete AI annotation platform: AI Annotation Engine, Learning Library, Data Layer, Output Generation, Admin Interface, GCP Infrastructure. 84%+ accuracy on floorplan takeoffs.",
-      stage: "delivered", estimated_value_usd: 30000, estimated_delivery: "2026-03-19",
-      delivered_date: "2026-03-19", phase: "Phase 1",
+      stage: "delivered", locked: true, priority_order: 1,
+      estimated_value_usd: 30000, actual_value_usd: 30000,
+      estimated_start: "2026-02-15", estimated_delivery: "2026-03-19", delivered_date: "2026-03-19",
       components: ["AI Annotation Engine", "Learning Library", "Data Layer", "Output Generation", "Admin Interface", "GCP Infrastructure"],
-      waiting_on_client: false, waiting_reason: "", notes: "Phase 1 complete. Ready for acceptance.", client_visible: true,
+      waiting_on_client: false, waiting_reason: "",
+      notes: "Phase 1 complete. Ready for acceptance.", client_visible: true,
       created_at: now, updated_at: now,
     },
     {
-      client_id: clientId, title: "IVC Managed Platform — Monthly Retainer",
+      id: uuid(), client_id: clientId,
+      title: "IVC Managed Platform — Monthly Retainer",
       description: "Platform monitoring, maintenance, incident response, ongoing improvements, monthly review, priority access to Nouvia engineering.",
-      stage: "estimated", estimated_value_usd: 60000, estimated_delivery: "2026-04-01",
-      delivered_date: null, phase: "Phase 3",
+      stage: "estimated", locked: false, priority_order: 2,
+      estimated_value_usd: 60000, monthly_value_usd: 5000,
+      estimated_start: "2026-04-01", estimated_delivery: null,
       components: ["Platform Monitoring", "Maintenance & Patches", "Incident Response", "Monthly Review", "Priority Access"],
-      waiting_on_client: true, waiting_reason: "SOW pending signature", notes: "$5,000/month recurring", client_visible: true,
+      waiting_on_client: true, waiting_reason: "SOW pending signature",
+      notes: "$5,000/month recurring", client_visible: true,
       created_at: now, updated_at: now,
     },
     {
-      client_id: clientId, title: "ChatGPT Enterprise Migration — 11 Users",
+      id: uuid(), client_id: clientId,
+      title: "ChatGPT Enterprise Migration — 11 Users",
       description: "Transitioning from Gemini Enterprise to ChatGPT Enterprise for 11 IVC team members.",
-      stage: "in_progress", estimated_value_usd: null, estimated_delivery: "2026-03-24",
-      delivered_date: null, phase: "Phase 2",
-      components: [], waiting_on_client: false, waiting_reason: "", notes: "Migration in progress", client_visible: true,
+      stage: "building", locked: true, priority_order: 3,
+      estimated_value_usd: null,
+      estimated_start: "2026-03-19", estimated_delivery: "2026-03-24",
+      components: [], waiting_on_client: false, waiting_reason: "",
+      notes: "Migration in progress", client_visible: true,
       created_at: now, updated_at: now,
     },
     {
-      client_id: clientId, title: "SolidWorks PDM + Genius ERP Integration",
+      id: uuid(), client_id: clientId,
+      title: "SolidWorks PDM + Genius ERP Integration",
       description: "AI layer connecting part geometry data from SolidWorks PDM with costed BOM data in Genius ERP.",
-      stage: "scoping", estimated_value_usd: null, estimated_delivery: "2026-03-31",
-      delivered_date: null, phase: "Phase 2",
+      stage: "scoping", locked: false, priority_order: 4,
+      estimated_value_usd: null,
+      estimated_start: "2026-03-24", estimated_delivery: "2026-04-15",
       components: [], waiting_on_client: true,
       waiting_reason: "3 data items needed: (1) ERP data cleansing workstream owner, (2) costing method confirmation in Genius, (3) acceptable threshold between standard cost and last purchase price",
       notes: "Blocked until IVC provides data items", client_visible: true,
       created_at: now, updated_at: now,
     },
     {
-      client_id: clientId, title: "Engineering Scoping Solution — AI Estimation Platform",
-      description: "Floorplan → part codes → Genius ERP → BOM → cost estimate. The path to bringing estimation in-house and replacing the $150k offshore process.",
-      stage: "scoping", estimated_value_usd: null, estimated_delivery: "2026-04-30",
-      delivered_date: null, phase: "Phase 2",
-      components: [], waiting_on_client: false, waiting_reason: "", notes: "Depends on ERP integration completion", client_visible: true,
+      id: uuid(), client_id: clientId,
+      title: "Engineering Scoping Solution — AI Estimation Platform",
+      description: "Floorplan \u2192 part codes \u2192 Genius ERP \u2192 BOM \u2192 cost estimate. The path to bringing estimation in-house and replacing the $150k offshore process.",
+      stage: "scoping", locked: false, priority_order: 5,
+      estimated_value_usd: null,
+      estimated_start: "2026-04-15", estimated_delivery: "2026-05-15",
+      components: [], waiting_on_client: false, waiting_reason: "",
+      notes: "Depends on ERP integration completion", client_visible: true,
       created_at: now, updated_at: now,
     },
     {
-      client_id: clientId, title: "ESSOR Discovery — Revenue Québec Grant",
-      description: "Formal discovery phase for the approved Investissement Québec ESSOR grant. Covers AI platform assessment and expansion roadmap.",
-      stage: "scoping", estimated_value_usd: null, estimated_delivery: null,
-      delivered_date: null, phase: "Phase 2",
-      components: [], waiting_on_client: false, waiting_reason: "", notes: "Grant approved. Discovery starting April.", client_visible: true,
+      id: uuid(), client_id: clientId,
+      title: "ESSOR Discovery — Revenue Qu\u00e9bec Grant",
+      description: "Formal discovery phase for the approved Investissement Qu\u00e9bec ESSOR grant. Covers AI platform assessment and expansion roadmap.",
+      stage: "scoping", locked: false, priority_order: 6,
+      estimated_value_usd: null,
+      estimated_start: "2026-04-01", estimated_delivery: "2026-05-01",
+      components: [], waiting_on_client: false, waiting_reason: "",
+      notes: "Grant approved. Discovery starting April.", client_visible: true,
       created_at: now, updated_at: now,
     },
   ];
@@ -70,62 +88,82 @@ function seedProjects(clientId) {
 
 function seedActivity(clientId) {
   return [
-    { client_id: clientId, date: "2026-03-24", description: "ChatGPT Enterprise migration in progress — 11 users transitioning", type: "status_change", badge: "In Progress" },
-    { client_id: clientId, date: "2026-03-24", description: "SolidWorks PDM + Genius ERP integration scoped — awaiting 3 data items from IVC", type: "status_change", badge: "Waiting on IVC" },
-    { client_id: clientId, date: "2026-03-19", description: "Phase 1 Floorplan Takeoff Platform delivered — 6 components, 84%+ accuracy", type: "delivery", badge: "Delivered" },
+    { client_id: clientId, date: "2026-03-24", description: "ChatGPT Enterprise migration in progress \u2014 11 users transitioning", type: "status_change", badge: "In Progress" },
+    { client_id: clientId, date: "2026-03-24", description: "SolidWorks PDM + Genius ERP integration scoped \u2014 awaiting 3 data items from IVC", type: "status_change", badge: "Waiting on IVC" },
+    { client_id: clientId, date: "2026-03-19", description: "Phase 1 Floorplan Takeoff Platform delivered \u2014 6 components, 84%+ accuracy", type: "delivery", badge: "Delivered" },
     { client_id: clientId, date: "2026-03-19", description: "Investment summary sent for review", type: "document", badge: "Document" },
-    { client_id: clientId, date: "2026-03-17", description: "Engineering estimation solution scoped — path to replacing $150k offshore process", type: "status_change", badge: "Scoping" },
-    { client_id: clientId, date: "2026-03-15", description: "ESSOR grant (Revenue Québec) approved — discovery phase starting April", type: "milestone", badge: "Milestone" },
-  ];
-}
-
-function seedDocuments(clientId) {
-  return [
-    { client_id: clientId, title: "IVC AI Platform — Phase 1 Investment Summary", category: "estimate", status: "sent", uploaded_at: "2026-03-19", notes: "Detailed breakdown of Phase 1 investment and deliverables" },
-    { client_id: clientId, title: "Managed Platform SOW — $5,000/month", category: "contract", status: "pending_signature", uploaded_at: "2026-03-20", notes: "Monthly retainer for ongoing platform management" },
+    { client_id: clientId, date: "2026-03-17", description: "Engineering estimation solution scoped \u2014 path to replacing $150k offshore process", type: "status_change", badge: "Scoping" },
+    { client_id: clientId, date: "2026-03-15", description: "ESSOR grant (Revenue Qu\u00e9bec) approved \u2014 discovery phase starting April", type: "milestone", badge: "Milestone" },
   ];
 }
 
 /* ═══════════ HOOKS ═══════════ */
+const SEED_VERSION = 'v2-final-3';
 
 export function usePortalProjects(clientId) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const STORAGE_KEY = `portal:projects:${clientId}`;
+  const VERSION_KEY = `portal:seed-version:${clientId}`;
 
   useEffect(() => {
     if (!clientId) return;
-    // Try localStorage first for instant render
+    const storedVersion = localStorage.getItem(VERSION_KEY);
     const cached = localStorage.getItem(STORAGE_KEY);
-    if (cached) {
+
+    if (storedVersion === SEED_VERSION && cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (parsed.length > 0) { setProjects(parsed); setLoading(false); }
+        if (parsed.length > 0) { setProjects(parsed); setLoading(false); return; }
       } catch (e) { /* ignore */ }
     }
-    // Force reseed for V2 (delivered Phase 1 in queue)
-    const needsReseed = !cached || JSON.parse(cached).length === 0
-      || JSON.parse(cached).some(p => p.title?.includes('Phase 1') && p.stage === 'accepted');
-    if (needsReseed) {
-      const seeded = seedProjects(clientId);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
-      setProjects(seeded);
-    }
+
+    // Seed or reseed
+    const seeded = seedProjects(clientId);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+    localStorage.setItem(VERSION_KEY, SEED_VERSION);
+    setProjects(seeded);
     setLoading(false);
   }, [clientId]);
 
-  const updateProject = useCallback((projectId, updates) => {
+  const updateProject = useCallback((titleOrId, updates) => {
     setProjects(prev => {
-      const next = prev.map(p => p === prev.find(pp => pp.title === projectId) || p.title === projectId
-        ? { ...p, ...updates, updated_at: new Date().toISOString() }
-        : p
+      const next = prev.map(p =>
+        (p.title === titleOrId || p.id === titleOrId)
+          ? { ...p, ...updates, locked: isLocked(updates.stage || p.stage), updated_at: new Date().toISOString() }
+          : p
       );
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       return next;
     });
   }, [STORAGE_KEY]);
 
-  return { projects, loading, updateProject };
+  const addProject = useCallback((data) => {
+    setProjects(prev => {
+      const newP = {
+        id: uuid(), client_id: clientId, ...data,
+        locked: isLocked(data.stage || 'requested'),
+        priority_order: prev.length + 1,
+        created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+      };
+      const next = [...prev, newP];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, [clientId, STORAGE_KEY]);
+
+  const reorderProjects = useCallback((reorderedIds) => {
+    setProjects(prev => {
+      const next = prev.map(p => {
+        const idx = reorderedIds.indexOf(p.id);
+        return idx >= 0 ? { ...p, priority_order: idx + 1 } : p;
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, [STORAGE_KEY]);
+
+  return { projects, loading, updateProject, addProject, reorderProjects };
 }
 
 export function usePortalActivity(clientId) {
@@ -152,26 +190,7 @@ export function usePortalActivity(clientId) {
 }
 
 export function usePortalDocuments(clientId) {
-  const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const STORAGE_KEY = `portal:documents:${clientId}`;
-
-  useEffect(() => {
-    if (!clientId) return;
-    const cached = localStorage.getItem(STORAGE_KEY);
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (parsed.length > 0) { setDocuments(parsed); setLoading(false); return; }
-      } catch (e) { /* ignore */ }
-    }
-    const seeded = seedDocuments(clientId);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
-    setDocuments(seeded);
-    setLoading(false);
-  }, [clientId]);
-
-  return { documents, loading };
+  return { documents: [], loading: false };
 }
 
 export function usePortalRequests(clientId) {
@@ -188,10 +207,11 @@ export function usePortalRequests(clientId) {
 
   const submitRequest = useCallback((data) => {
     const newReq = {
-      ...data,
-      client_id: clientId,
-      status: 'new',
-      submitted_at: new Date().toISOString(),
+      ...data, id: uuid(), client_id: clientId,
+      stage: 'requested', locked: false,
+      priority_order: 999,
+      status: 'new', submitted_at: new Date().toISOString(),
+      created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
     };
     setRequests(prev => {
       const next = [newReq, ...prev];
