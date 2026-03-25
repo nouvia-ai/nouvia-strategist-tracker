@@ -1032,7 +1032,13 @@ function PlatformPage() {
 /* ═══════════════════════════════════════════════════
    MAIN PORTAL COMPONENT
    ═══════════════════════════════════════════════════ */
+// V3: IVC AI Cockpit — replaces V2 portal
+import CockpitShell from './components/ClientCockpit/CockpitShell';
 export default function Portal() {
+  return <CockpitShell />;
+}
+
+function Portal_V2_ARCHIVED() {
   const user = useUser();
   const clientId = user?.client_id || 'ivc';
   const displayName = user?.display_name || 'User';
