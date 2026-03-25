@@ -124,7 +124,7 @@ const NIP_SECTIONS = [
     ],
   },
   {
-    id: "bsp", label: "BSP", icon: "▣",
+    id: "bsp", label: "BSI", icon: "▣",
     subTabs: [
       { id: "canvas",      label: "Canvas",      icon: "▣" },
       { id: "experiments", label: "Experiments", icon: "△" },
@@ -134,14 +134,14 @@ const NIP_SECTIONS = [
     ],
   },
   {
-    id: "funnel", label: "Funnel", icon: "◉",
+    id: "funnel", label: "SI", icon: "◉",
     subTabs: [
       { id: "clients",  label: "Clients",  icon: "◉" },
       { id: "pipeline", label: "Pipeline", icon: "📊" },
     ],
   },
   {
-    id: "os", label: "OS", icon: "⚙",
+    id: "os", label: "DSI", icon: "⚙",
     subTabs: [
       { id: "coworkers",  label: "Coworkers",  icon: "⚙" },
       { id: "skills",     label: "Skills",     icon: "◇" },

@@ -64,7 +64,7 @@ export default function CockpitShell() {
         {/* Center: title */}
         <div className="absolute left-1/2 -translate-x-1/2">
           <span className="text-xl font-semibold text-gray-900">
-            {user?.company_name || 'IVC'} AI Platform
+            {user?.company_name || 'IVC'} AI Management System
           </span>
         </div>
 
