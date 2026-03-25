@@ -108,11 +108,17 @@ export async function updatePillarProgress(pillarId, progress, capabilities) {
 
 // ─── Ideas ────────────────────────────────────────
 export async function getIdeas(clientId, status) {
-  // If status is null/undefined, fetch all non-terminal statuses
+  // If status is null/undefined, fetch all non-terminal statuses (no orderBy to avoid index requirement)
   if (!status) {
-    const q = query(collection(db, 'ivc_ideas'), where('clientId', '==', clientId), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, 'ivc_ideas'), where('clientId', '==', clientId));
     const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(i => !['approved', 'declined', 'rejected'].includes(i.status));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .filter(i => !['approved', 'declined', 'rejected'].includes(i.status))
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   }
   const q = query(collection(db, 'ivc_ideas'), where('clientId', '==', clientId), where('status', '==', status), orderBy('createdAt', 'desc'));
   const snap = await getDocs(q);

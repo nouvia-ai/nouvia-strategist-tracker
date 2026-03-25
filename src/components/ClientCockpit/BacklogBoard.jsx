@@ -172,7 +172,7 @@ function DetailPanel({ item, onClose, onNoteSaved }) {
 }
 
 /* ══════════ ROADMAP TIMELINE — WS5 ══════════ */
-function RoadmapTimeline({ items, onItemClick }) {
+function RoadmapTimeline({ items, onItemClick, onUpdateItem, onReloadBacklog }) {
   const user = useUser();
   const isNouvia = user?.role === 'admin';
   const [datePicker, setDatePicker] = useState(null);
@@ -266,6 +266,7 @@ function RoadmapTimeline({ items, onItemClick }) {
     setCrText('');
     setToast('Change request submitted — Nouvia will review and update your backlog.');
     setTimeout(() => setToast(null), 4000);
+    onReloadBacklog();
   };
 
   return (
@@ -294,6 +295,9 @@ function RoadmapTimeline({ items, onItemClick }) {
             if (Math.abs(daysDelta) >= 1 && dragging.originalTargetDate) {
               const newDate = new Date(dragging.originalTargetDate);
               newDate.setDate(newDate.getDate() + daysDelta);
+              const newTimestamp = { seconds: Math.floor(newDate.getTime() / 1000) };
+              // Optimistic local state update so bar moves immediately
+              onUpdateItem(dragging.itemId, { targetDate: newTimestamp });
               await updateBacklogTargetDate(dragging.itemId, newDate.toISOString());
               setToast('Date updated');
               setTimeout(() => setToast(null), 3000);
@@ -575,7 +579,9 @@ export default function BacklogBoard() {
         </div>
       ) : (
         /* ── ROADMAP TIMELINE — WS5 ── */
-        <RoadmapTimeline items={backlog} onItemClick={setDetailItem} />
+        <RoadmapTimeline items={backlog} onItemClick={setDetailItem}
+          onUpdateItem={(id, updates) => setBacklog(prev => prev.map(item => item.id === id ? { ...item, ...updates } : item))}
+          onReloadBacklog={loadBacklog} />
       )}
 
       {/* Detail panel */}
