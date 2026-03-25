@@ -64,13 +64,13 @@ function seedProjects(clientId) {
     },
     {
       id: uuid(), client_id: clientId,
-      title: "Engineering Scoping Solution — AI Estimation Platform",
-      description: "Floorplan \u2192 part codes \u2192 Genius ERP \u2192 BOM \u2192 cost estimate. The path to bringing estimation in-house and replacing the $150k offshore process.",
+      title: "AI Estimation",
+      description: "Improve accuracy and speed of Estimation with AI.",
       stage: "scoping", locked: false, priority_order: 5,
       estimated_value_usd: null,
       estimated_start: "2026-04-15", estimated_delivery: "2026-05-15",
-      components: [], waiting_on_client: false, waiting_reason: "",
-      notes: "Depends on ERP integration completion", client_visible: true,
+      components: ["Genius ERP Integration to Google Cloud Platform", "Estimation AI Engine"], waiting_on_client: false, waiting_reason: "",
+      notes: "Path to bringing estimation in-house and replacing the $150k offshore process", client_visible: true,
       created_at: now, updated_at: now,
     },
     {
@@ -93,13 +93,13 @@ function seedActivity(clientId) {
     { client_id: clientId, date: "2026-03-24", description: "Design Scoping Solution scoped \u2014 connecting PDM geometry to engineering drawings", type: "status_change", badge: "Scoping" },
     { client_id: clientId, date: "2026-03-19", description: "Phase 1 Floorplan Takeoff Platform delivered \u2014 6 components, 84%+ accuracy", type: "delivery", badge: "Delivered" },
     { client_id: clientId, date: "2026-03-19", description: "Investment summary sent for review", type: "document", badge: "Document" },
-    { client_id: clientId, date: "2026-03-17", description: "Engineering estimation solution scoped \u2014 path to replacing $150k offshore process", type: "status_change", badge: "Scoping" },
+    { client_id: clientId, date: "2026-03-17", description: "AI Estimation scoped \u2014 improve accuracy and speed with AI", type: "status_change", badge: "Scoping" },
     { client_id: clientId, date: "2026-03-15", description: "ESSOR grant (Revenue Qu\u00e9bec) approved \u2014 discovery phase starting April", type: "milestone", badge: "Milestone" },
   ];
 }
 
 /* ═══════════ HOOKS ═══════════ */
-const SEED_VERSION = 'v2-final-5';
+const SEED_VERSION = 'v2-final-6';
 
 export function usePortalProjects(clientId) {
   const [projects, setProjects] = useState([]);
