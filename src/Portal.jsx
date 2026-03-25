@@ -837,7 +837,7 @@ function InvestmentPage({ projects }) {
   if (paybackIdx < 0) paybackIdx = 8;
 
   const upcomingItems = [
-    { title: 'SolidWorks PDM + Genius ERP Integration', status: 'Scoping' },
+    { title: 'Design Scoping Solution', status: 'Scoping' },
     { title: 'Engineering Scoping Solution', status: 'Scoping' },
     { title: 'ESSOR Discovery (Revenue Quebec)', status: 'Scoping' },
   ];

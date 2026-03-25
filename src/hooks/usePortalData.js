@@ -51,14 +51,15 @@ function seedProjects(clientId) {
     },
     {
       id: uuid(), client_id: clientId,
-      title: "SolidWorks PDM + Genius ERP Integration",
-      description: "AI layer connecting part geometry data from SolidWorks PDM with costed BOM data in Genius ERP.",
+      title: "Design Scoping Solution",
+      description: "AI-powered design scoping that connects SolidWorks PDM part geometry with Genius ERP costing data to auto-generate scoped BOMs and cost estimates from engineering drawings. Replaces manual lookup across disconnected systems.",
       stage: "scoping", locked: false, priority_order: 4,
       estimated_value_usd: null,
       estimated_start: "2026-03-24", estimated_delivery: "2026-04-15",
-      components: [], waiting_on_client: true,
+      components: ["PDM Data Bridge", "ERP Cost Lookup", "BOM Generator", "Scoping Interface"],
+      waiting_on_client: true,
       waiting_reason: "3 data items needed: (1) ERP data cleansing workstream owner, (2) costing method confirmation in Genius, (3) acceptable threshold between standard cost and last purchase price",
-      notes: "Blocked until IVC provides data items", client_visible: true,
+      notes: "Connects SolidWorks PDM \u2192 Genius ERP to auto-scope designs. Blocked until IVC provides 3 data items.", client_visible: true,
       created_at: now, updated_at: now,
     },
     {
@@ -89,7 +90,7 @@ function seedProjects(clientId) {
 function seedActivity(clientId) {
   return [
     { client_id: clientId, date: "2026-03-24", description: "ChatGPT Enterprise migration in progress \u2014 11 users transitioning", type: "status_change", badge: "In Progress" },
-    { client_id: clientId, date: "2026-03-24", description: "SolidWorks PDM + Genius ERP integration scoped \u2014 awaiting 3 data items from IVC", type: "status_change", badge: "Waiting on IVC" },
+    { client_id: clientId, date: "2026-03-24", description: "Design Scoping Solution scoped \u2014 awaiting 3 data items from IVC", type: "status_change", badge: "Waiting on IVC" },
     { client_id: clientId, date: "2026-03-19", description: "Phase 1 Floorplan Takeoff Platform delivered \u2014 6 components, 84%+ accuracy", type: "delivery", badge: "Delivered" },
     { client_id: clientId, date: "2026-03-19", description: "Investment summary sent for review", type: "document", badge: "Document" },
     { client_id: clientId, date: "2026-03-17", description: "Engineering estimation solution scoped \u2014 path to replacing $150k offshore process", type: "status_change", badge: "Scoping" },
@@ -98,7 +99,7 @@ function seedActivity(clientId) {
 }
 
 /* ═══════════ HOOKS ═══════════ */
-const SEED_VERSION = 'v2-final-3';
+const SEED_VERSION = 'v2-final-4';
 
 export function usePortalProjects(clientId) {
   const [projects, setProjects] = useState([]);
