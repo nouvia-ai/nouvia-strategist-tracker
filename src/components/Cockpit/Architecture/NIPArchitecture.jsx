@@ -73,6 +73,38 @@ function ModuleCard({ module, accent }) {
   )
 }
 function OverviewTab({ status }) {
+  // Status-driven color maps
+  const svgColors = {
+    live:     { fill: '#E6F1FB', stroke: '#85B7EB', title: '#0C447C', sub: '#185FA5' },
+    building: { fill: '#FFFBEB', stroke: '#FCD34D', title: '#92400E', sub: '#B45309' },
+    planned:  { fill: '#F3F4F6', stroke: '#D1D5DB', title: '#4B5563', sub: '#9CA3AF' },
+    agentic:  { fill: '#F3E8FF', stroke: '#C4B5FD', title: '#6D28D9', sub: '#7C3AED' },
+  }
+  const studioColors = { fill: '#EEEDFE', stroke: '#AFA9EC', title: '#3C3489', sub: '#534AB7' }
+  const dsiColors = { fill: '#E1F5EE', stroke: '#5DCAA5', title: '#085041', sub: '#0F6E56' }
+
+  // Read statuses from data
+  const getModuleStatus = (side, id) => {
+    const modules = side === 'studio' ? status.studio?.modules : status.aims?.modules
+    return modules?.find(m => m.id === id)?.status || 'planned'
+  }
+  const phase0Status = status.phase0?.status || 'building'
+  const phase0Live = phase0Status === 'live'
+  const phase0Colors = phase0Live
+    ? { fill: '#E1F5EE', stroke: '#5DCAA5', title: '#085041', sub: '#0F6E56', dash: '' }
+    : { fill: '#FFFBEB', stroke: '#FCD34D', title: '#92400E', sub: '#B45309', dash: '5 3' }
+  const phase0Label = phase0Live ? 'Phase 0 · Complete · DSI ↔ AIMS synced' : 'Phase 0 · Closed-loop Firestore sync · DSI ↔ AIMS'
+
+  const getAimsBoxColors = (id) => {
+    const s = getModuleStatus('aims', id)
+    return svgColors[s] || svgColors.planned
+  }
+
+  const cmdC = getAimsBoxColors('command')
+  const bklC = getAimsBoxColors('backlog')
+  const hlthC = getAimsBoxColors('health')
+  const invC = getAimsBoxColors('investment')
+
   return (
     <div className="space-y-4">
       {/* SVG Architecture Diagram */}
@@ -99,109 +131,110 @@ function OverviewTab({ status }) {
           </text>
           {/* BSI */}
           <rect x="10" y="60" width="205" height="66" rx="8"
-            fill="#EEEDFE" stroke="#AFA9EC" strokeWidth="0.5"/>
+            fill={studioColors.fill} stroke={studioColors.stroke} strokeWidth="0.5"/>
           <text x="112" y="85" textAnchor="middle" dominantBaseline="central"
-            fontSize="13" fontWeight="500" fill="#3C3489"
+            fontSize="13" fontWeight="500" fill={studioColors.title}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">BSI</text>
           <text x="112" y="108" textAnchor="middle" dominantBaseline="central"
-            fontSize="11" fill="#534AB7"
+            fontSize="11" fill={studioColors.sub}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             Canvas · experiments · trends
           </text>
           {/* SI */}
           <rect x="227" y="60" width="205" height="66" rx="8"
-            fill="#EEEDFE" stroke="#AFA9EC" strokeWidth="0.5"/>
+            fill={studioColors.fill} stroke={studioColors.stroke} strokeWidth="0.5"/>
           <text x="329" y="85" textAnchor="middle" dominantBaseline="central"
-            fontSize="13" fontWeight="500" fill="#3C3489"
+            fontSize="13" fontWeight="500" fill={studioColors.title}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">SI</text>
           <text x="329" y="108" textAnchor="middle" dominantBaseline="central"
-            fontSize="11" fill="#534AB7"
+            fontSize="11" fill={studioColors.sub}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             Pipeline · prospects · funnel
           </text>
           {/* DSI */}
           <rect x="444" y="60" width="226" height="66" rx="8"
-            fill="#E1F5EE" stroke="#5DCAA5" strokeWidth="0.5"/>
+            fill={dsiColors.fill} stroke={dsiColors.stroke} strokeWidth="0.5"/>
           <text x="557" y="85" textAnchor="middle" dominantBaseline="central"
-            fontSize="13" fontWeight="500" fill="#085041"
+            fontSize="13" fontWeight="500" fill={dsiColors.title}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">DSI</text>
           <text x="557" y="108" textAnchor="middle" dominantBaseline="central"
-            fontSize="11" fill="#0F6E56"
+            fontSize="11" fill={dsiColors.sub}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             Delivery · client bridge
           </text>
-          {/* Phase 0 Bar */}
+          {/* Phase 0 Bar — data-driven */}
           <rect x="12" y="136" width="656" height="40" rx="8"
-            fill="#FFFBEB" stroke="#FCD34D" strokeWidth="0.5" strokeDasharray="5 3"/>
+            fill={phase0Colors.fill} stroke={phase0Colors.stroke} strokeWidth="0.5"
+            strokeDasharray={phase0Colors.dash}/>
           <text x="340" y="154" textAnchor="middle" dominantBaseline="central"
-            fontSize="11" fill="#92400E"
+            fontSize="11" fill={phase0Colors.title}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
-            Phase 0 · Closed-loop Firestore sync · DSI ↔ AIMS
+            {phase0Label}
           </text>
-          <text x="80" y="170" textAnchor="middle" fontSize="10" fill="#B45309"
+          <text x="80" y="170" textAnchor="middle" fontSize="10" fill={phase0Colors.sub}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
-            ← studio updates
+            {phase0Live ? '✓ studio synced' : '← studio updates'}
           </text>
-          <text x="600" y="170" textAnchor="middle" fontSize="10" fill="#B45309"
+          <text x="600" y="170" textAnchor="middle" fontSize="10" fill={phase0Colors.sub}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
-            client activity →
+            {phase0Live ? '✓ client synced' : 'client activity →'}
           </text>
           {/* AIMS label */}
           <text x="16" y="194" fontSize="10" fill="#185FA5" fontWeight="600"
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             AI MANAGEMENT SYSTEM · AIMS
           </text>
-          {/* Command Center */}
+          {/* Command Center — data-driven */}
           <rect x="10" y="200" width="152" height="66" rx="8"
-            fill="#E6F1FB" stroke="#85B7EB" strokeWidth="0.5"/>
+            fill={cmdC.fill} stroke={cmdC.stroke} strokeWidth="0.5"/>
           <text x="86" y="225" textAnchor="middle" dominantBaseline="central"
-            fontSize="12" fontWeight="500" fill="#0C447C"
+            fontSize="12" fontWeight="500" fill={cmdC.title}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             Command center
           </text>
           <text x="86" y="248" textAnchor="middle" dominantBaseline="central"
-            fontSize="11" fill="#185FA5"
+            fontSize="11" fill={cmdC.sub}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             Goals · pillars
           </text>
-          {/* Backlog */}
+          {/* Backlog — data-driven */}
           <rect x="174" y="200" width="152" height="66" rx="8"
-            fill="#E6F1FB" stroke="#85B7EB" strokeWidth="0.5"/>
+            fill={bklC.fill} stroke={bklC.stroke} strokeWidth="0.5"/>
           <text x="250" y="225" textAnchor="middle" dominantBaseline="central"
-            fontSize="12" fontWeight="500" fill="#0C447C"
+            fontSize="12" fontWeight="500" fill={bklC.title}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             Backlog
           </text>
           <text x="250" y="248" textAnchor="middle" dominantBaseline="central"
-            fontSize="11" fill="#185FA5"
+            fontSize="11" fill={bklC.sub}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             Kanban · Gantt
           </text>
-          {/* Health */}
+          {/* Health — data-driven */}
           <rect x="338" y="200" width="152" height="66" rx="8"
-            fill="#F3F4F6" stroke="#D1D5DB" strokeWidth="0.5"/>
+            fill={hlthC.fill} stroke={hlthC.stroke} strokeWidth="0.5"/>
           <text x="414" y="225" textAnchor="middle" dominantBaseline="central"
-            fontSize="12" fontWeight="500" fill="#4B5563"
+            fontSize="12" fontWeight="500" fill={hlthC.title}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             Health
           </text>
           <text x="414" y="248" textAnchor="middle" dominantBaseline="central"
-            fontSize="11" fill="#9CA3AF"
+            fontSize="11" fill={hlthC.sub}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
-            Phase 2
+            {getModuleStatus('aims', 'health') === 'live' ? 'Metrics · SLA' : 'Phase 2'}
           </text>
-          {/* Investment */}
+          {/* Investment — data-driven */}
           <rect x="502" y="200" width="168" height="66" rx="8"
-            fill="#F3F4F6" stroke="#D1D5DB" strokeWidth="0.5"/>
+            fill={invC.fill} stroke={invC.stroke} strokeWidth="0.5"/>
           <text x="586" y="225" textAnchor="middle" dominantBaseline="central"
-            fontSize="12" fontWeight="500" fill="#4B5563"
+            fontSize="12" fontWeight="500" fill={invC.title}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             Investment
           </text>
           <text x="586" y="248" textAnchor="middle" dominantBaseline="central"
-            fontSize="11" fill="#9CA3AF"
+            fontSize="11" fill={invC.sub}
             fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
-            Phase 2
+            {getModuleStatus('aims', 'investment') === 'live' ? 'ROI · spend' : 'Phase 2'}
           </text>
           {/* IVC Footer */}
           <rect x="12" y="276" width="656" height="18" rx="6" fill="#0F6E56"/>
