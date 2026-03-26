@@ -144,16 +144,23 @@ export function subscribeToDeliverItems(callback) {
 
 // ── OPERATE TENTACLE ──────────────────────────────────────
 export function subscribeToOperateItems(callback) {
-  const items = { priority: [], experiments: [], todos: [] };
-  let loaded = { priority: false, experiments: false, todos: false };
+  const items = { priority: [], todos: [] };
+  let loaded = { priority: false, todos: false };
   function emit() {
     if (!Object.values(loaded).every(Boolean)) return;
-    callback([...items.priority, ...items.experiments, ...items.todos].sort((a, b) => a.priority - b.priority));
+    callback([...items.priority, ...items.todos].sort((a, b) => a.priority - b.priority));
   }
+
+  const errHandler = (src) => (err) => {
+    console.warn(`MB operate: ${src} subscription error`, err.message);
+    // Mark as loaded so other streams still render
+    loaded[src] = true;
+    emit();
+  };
 
   const unsubPQ = onSnapshot(
     collection(db, 'priority_queue'),
-    snap => {
+    (snap) => {
       items.priority = snap.docs.map(d => {
         const data = d.data();
         if (data.status === 'Done') return null;
@@ -166,16 +173,13 @@ export function subscribeToOperateItems(callback) {
         };
       }).filter(Boolean);
       loaded.priority = true; emit();
-    }
+    },
+    errHandler('priority')
   );
-
-  // Experiments are stored in localStorage (not Firestore), skip subscription
-  items.experiments = [];
-  loaded.experiments = true;
 
   const unsubTodos = onSnapshot(
     collection(db, 'weekly_todos'),
-    snap => {
+    (snap) => {
       items.todos = snap.docs.map(d => {
         const data = d.data();
         if (data.completed) return null;
@@ -187,7 +191,8 @@ export function subscribeToOperateItems(callback) {
         };
       }).filter(Boolean);
       loaded.todos = true; emit();
-    }
+    },
+    errHandler('todos')
   );
 
   return () => { unsubPQ(); unsubTodos(); };
@@ -197,7 +202,7 @@ export function subscribeToOperateItems(callback) {
 export function subscribeToSalesItems(callback) {
   return onSnapshot(
     collection(db, 'client_backlog'),
-    snap => {
+    (snap) => {
       const items = snap.docs.map(d => {
         const data = d.data();
         if (data.status === 'Paid') return null;
@@ -211,7 +216,8 @@ export function subscribeToSalesItems(callback) {
         };
       }).filter(Boolean);
       callback(items);
-    }
+    },
+    (err) => { console.warn('MB sales error:', err.message); callback([]); }
   );
 }
 
@@ -219,7 +225,7 @@ export function subscribeToSalesItems(callback) {
 export function subscribeToMarketingItems(callback) {
   return onSnapshot(
     collection(db, 'marketing_tasks'),
-    snap => {
+    (snap) => {
       const items = snap.docs.map(d => {
         const data = d.data();
         return {
@@ -232,7 +238,8 @@ export function subscribeToMarketingItems(callback) {
         };
       });
       callback(items);
-    }
+    },
+    (err) => { console.warn('MB marketing error:', err.message); callback([]); }
   );
 }
 
@@ -240,7 +247,7 @@ export function subscribeToMarketingItems(callback) {
 export function subscribeToManualItems(callback) {
   return onSnapshot(
     collection(db, 'master_backlog'),
-    snap => {
+    (snap) => {
       const items = snap.docs.map(d => {
         const data = d.data();
         return {
@@ -253,7 +260,8 @@ export function subscribeToManualItems(callback) {
         };
       });
       callback(items);
-    }
+    },
+    (err) => { console.warn('MB manual error:', err.message); callback([]); }
   );
 }
 

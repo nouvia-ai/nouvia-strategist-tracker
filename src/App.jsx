@@ -787,7 +787,7 @@ function Dashboard({ clients, experiments, decisions, trends, canvas, coworkers,
 export default function App() {
   const [section, setSection] = useState("cockpit");
   const [dsiUnread, setDsiUnread] = useState(0);
-  const [subTab, setSubTab]   = useState("master_backlog");
+  const [subTab, setSubTab]   = useState("overview");
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState(() => localStorage.getItem("strategist:theme") || "dark");
   const track = useTrackerEvents();
