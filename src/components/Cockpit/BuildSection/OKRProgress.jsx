@@ -59,7 +59,14 @@ export default function OKRProgress({ onNavigate }) {
 
   if (loading) return <Skeleton />;
 
-  if (!okr || !(okr.objectives || []).length) {
+  // objectives may be stored as JSON string by MCP set_okr tool
+  let objectives = okr?.objectives || [];
+  if (typeof objectives === 'string') {
+    try { objectives = JSON.parse(objectives); } catch { objectives = []; }
+  }
+  if (!Array.isArray(objectives)) objectives = [];
+
+  if (!okr || !objectives.length) {
     return (
       <div style={{ padding: 'var(--space-4)', backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)', fontSize: 13, color: 'var(--color-text-ghost)', fontFamily: 'var(--font-sans)' }}>
         No OKRs found. Use <code>set_okr</code> in Claude to add them.
@@ -71,7 +78,7 @@ export default function OKRProgress({ onNavigate }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-      {(okr.objectives || []).map(obj => {
+      {objectives.map(obj => {
         const krs      = obj.key_results || [];
         const avgProg  = krs.length ? Math.round(krs.reduce((s, kr) => s + (kr.progress || 0), 0) / krs.length) : 0;
         const color    = statusColor(avgProg, okrYear, okrQuarter);
