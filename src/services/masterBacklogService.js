@@ -152,7 +152,7 @@ export function subscribeToOperateItems(callback) {
   }
 
   const unsubPQ = onSnapshot(
-    query(collection(db, 'priority_queue'), orderBy('priority')),
+    collection(db, 'priority_queue'),
     snap => {
       items.priority = snap.docs.map(d => {
         const data = d.data();
@@ -170,7 +170,7 @@ export function subscribeToOperateItems(callback) {
   );
 
   const unsubExp = onSnapshot(
-    query(collection(db, 'experiments')),
+    collection(db, 'experiments'),
     snap => {
       items.experiments = snap.docs.map(d => {
         const data = d.data();
@@ -187,7 +187,7 @@ export function subscribeToOperateItems(callback) {
   );
 
   const unsubTodos = onSnapshot(
-    query(collection(db, 'weekly_todos')),
+    collection(db, 'weekly_todos'),
     snap => {
       items.todos = snap.docs.map(d => {
         const data = d.data();
@@ -209,7 +209,7 @@ export function subscribeToOperateItems(callback) {
 // ── SALES TENTACLE ────────────────────────────────────────
 export function subscribeToSalesItems(callback) {
   return onSnapshot(
-    query(collection(db, 'client_backlog'), orderBy('priority')),
+    collection(db, 'client_backlog'),
     snap => {
       const items = snap.docs.map(d => {
         const data = d.data();
@@ -231,7 +231,7 @@ export function subscribeToSalesItems(callback) {
 // ── MARKETING TENTACLE ────────────────────────────────────
 export function subscribeToMarketingItems(callback) {
   return onSnapshot(
-    query(collection(db, 'marketing_tasks'), orderBy('priority')),
+    collection(db, 'marketing_tasks'),
     snap => {
       const items = snap.docs.map(d => {
         const data = d.data();
@@ -252,7 +252,7 @@ export function subscribeToMarketingItems(callback) {
 // ── MANUAL TENTACLE ───────────────────────────────────────
 export function subscribeToManualItems(callback) {
   return onSnapshot(
-    query(collection(db, 'master_backlog'), orderBy('priority')),
+    collection(db, 'master_backlog'),
     snap => {
       const items = snap.docs.map(d => {
         const data = d.data();
