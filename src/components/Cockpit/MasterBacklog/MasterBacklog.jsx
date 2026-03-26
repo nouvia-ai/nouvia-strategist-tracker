@@ -9,6 +9,7 @@ import {
   updateMasterBacklogItemStatus,
   deleteMasterBacklogItem,
   addMasterBacklogItem,
+  getLearnItems,
 } from '../../../services/masterBacklogService';
 import BacklogBoard from './BacklogBoard';
 import BacklogRoadmap from './BacklogRoadmap';
@@ -23,7 +24,7 @@ const CAPACITY = [
 
 export default function MasterBacklog() {
   const [items, setItems] = useState({
-    build: [], deliver: [], sales: [], marketing: [], operate: [], manual: []
+    build: [], deliver: [], sales: [], marketing: [], operate: [], learn: [], manual: []
   });
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -42,6 +43,12 @@ export default function MasterBacklog() {
         build: archItems.filter(i => i.stream === 'build'),
       }));
     }).catch(err => console.warn('Master Backlog: arch load failed', err));
+
+    // Load LEARN items (one-time)
+    getLearnItems().then(learnItems => {
+      if (!mounted) return;
+      setItems(prev => ({ ...prev, learn: learnItems }));
+    }).catch(err => console.warn('Master Backlog: learn load failed', err));
 
     // Subscribe to live sources — each wrapped to prevent crash
     try {

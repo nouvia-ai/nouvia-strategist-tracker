@@ -122,5 +122,22 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
 
+    // ── Intelligence Layer collections ────────────────────────────────────
+    match /intelligence_foundations/{doc} {
+      allow read, write: if isAuthenticated();
+    }
+    match /intelligence_rules/{doc} {
+      allow read, write: if isAuthenticated();
+    }
+    match /intelligence_patterns/{doc} {
+      allow read, write: if isAuthenticated();
+    }
+    match /intelligence_inject_queue/{doc} {
+      allow read, write: if isAuthenticated();
+    }
+    match /intelligence_usage_log/{doc} {
+      allow read, write: if isAuthenticated();
+    }
+
   }
 }

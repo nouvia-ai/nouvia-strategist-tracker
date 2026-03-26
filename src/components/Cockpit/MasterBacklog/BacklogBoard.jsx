@@ -173,6 +173,15 @@ export default function BacklogBoard({ items, streamConfig, onStatusChange, onAd
         onStatusChange={onStatusChange} onDelete={onDelete}
         onAdd={() => onAddItem('operate')} filter={filter} />
 
+      {/* LEARN */}
+      {items.learn?.length > 0 && (
+        <StreamSection label="🧠 Learn" desc="Intelligence layer" target={null}
+          items={items.learn} bgClass="bg-violet-50/50" borderClass="border-violet-200"
+          textClass="text-violet-700" dotClass="bg-violet-500"
+          onStatusChange={onStatusChange} onDelete={onDelete}
+          onAdd={() => {}} filter={filter} />
+      )}
+
       {/* MANUAL */}
       {items.manual.length > 0 && (
         <StreamSection label="📌 Manual" desc="No source system" target={null}

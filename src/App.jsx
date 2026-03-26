@@ -12,6 +12,7 @@ import GoalManagement  from './components/Goals/GoalManagement';
 import NIPArchitecture from './components/Cockpit/Architecture/NIPArchitecture';
 import DSIShell from './components/Cockpit/DSI/DSIShell';
 import MasterBacklog from './components/Cockpit/MasterBacklog/MasterBacklog';
+import IntelligenceTab from './components/Cockpit/Intelligence/IntelligenceTab';
 import useAdoptionScores from './hooks/useAdoptionScores';
 import { NASDetail, NASEditForm } from './components/NAS/NASWidget';
 import useRiskAssessments from './hooks/useRiskAssessments';
@@ -125,6 +126,7 @@ const NIP_SECTIONS = [
       { id: "master_backlog", label: "Master Backlog", icon: "▣" },
       { id: "overview",       label: "Dashboard",      icon: "◈" },
       { id: "architecture",   label: "Architecture",   icon: "⬡" },
+      { id: "intelligence",   label: "Intelligence",   icon: "🧠" },
     ],
   },
   {
@@ -1015,6 +1017,7 @@ export default function App() {
 
         {/* Nouvia Studio — Architecture sub-tab */}
         {activeView === "architecture" && <NIPArchitecture />}
+        {activeView === "intelligence" && <IntelligenceTab />}
 
         {/* BSP sub-tabs */}
         {activeView === "canvas"      && <CanvasTab canvas={canvas} setCanvas={setCanvas} saveCanvas={sv} />}

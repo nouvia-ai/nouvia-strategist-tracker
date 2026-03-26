@@ -10,6 +10,7 @@ import {
   getDoc, setDoc, serverTimestamp
 } from 'firebase/firestore';
 import { subscribeToBacklog, updateIVCBacklogItem } from './dsiService';
+import { computeGaps, getStaleDocuments, getPromotionCandidates, getInjectQueue } from './intelligenceService';
 
 // ── NORMALISATION HELPERS ─────────────────────────────────
 function ivcStageToMBStatus(stage) {
@@ -320,4 +321,63 @@ export async function deleteMasterBacklogItem(item) {
   if (deleteable.includes(item.source)) {
     await deleteDoc(doc(db, item.source, item.sourceId));
   }
+}
+
+// ── LEARN STREAM ──────────────────────────────────────────
+export async function getLearnItems() {
+  const items = [];
+  try {
+    const gaps = await computeGaps();
+    gaps.filter(g => g.type !== 'stale').forEach(gap => {
+      items.push({
+        uid: `learn_gap_${gap.cluster}`, title: gap.message, stream: 'learn',
+        status: gap.type === 'critical' ? 'this_week' : 'next_week',
+        effortHours: gap.type === 'critical' ? 2 : 1, client: null,
+        priority: gap.type === 'critical' ? 1 : 2, dueDate: null, targetWeek: null,
+        notes: gap.detail, sourceSection: `Layer ${gap.layer} — ${gap.cluster_name}`,
+        source: 'intelligence_gaps', sourceId: `gap_${gap.cluster}`, action: 'inject', _raw: gap,
+      });
+    });
+  } catch (e) { console.warn('LEARN: gaps failed', e.message); }
+
+  try {
+    const stale = await getStaleDocuments();
+    if (stale.length > 0) {
+      items.push({
+        uid: 'learn_stale_batch', title: `${stale.length} stale documents to review`, stream: 'learn',
+        status: 'backlog', effortHours: 0.5, client: null, priority: 3,
+        dueDate: null, targetWeek: null, notes: 'Documents with 0 uses. Archive or refresh.',
+        sourceSection: 'Usage — Stale docs', source: 'intelligence_stale',
+        sourceId: 'stale_batch', action: 'archive', _raw: stale,
+      });
+    }
+  } catch (e) { console.warn('LEARN: stale failed', e.message); }
+
+  try {
+    const promotions = await getPromotionCandidates();
+    promotions.forEach(pat => {
+      items.push({
+        uid: `learn_promote_${pat.id}`, title: `Promote: ${pat.title}`, stream: 'learn',
+        status: 'backlog', effortHours: 0.25, client: pat.client || null, priority: 2,
+        dueDate: null, targetWeek: null, notes: (pat.content || '').substring(0, 120),
+        sourceSection: 'Layer 3 → Layer 2', source: 'intelligence_patterns',
+        sourceId: pat.id, action: 'promote', _raw: pat,
+      });
+    });
+  } catch (e) { console.warn('LEARN: promotions failed', e.message); }
+
+  try {
+    const queue = await getInjectQueue();
+    queue.forEach(item => {
+      items.push({
+        uid: `learn_inject_${item.id}`, title: `Ready: ${item.doc_count} documents`, stream: 'learn',
+        status: 'this_week', effortHours: 0.25, client: null, priority: 1,
+        dueDate: null, targetWeek: null, notes: `Cluster: ${item.tags?.cluster_name || ''}`,
+        sourceSection: 'Inject queue', source: 'intelligence_inject_queue',
+        sourceId: item.id, action: 'approve', _raw: item,
+      });
+    });
+  } catch (e) { console.warn('LEARN: queue failed', e.message); }
+
+  return items;
 }
