@@ -32,6 +32,7 @@ export default function MasterBacklog() {
 
   useEffect(() => {
     let mounted = true;
+    const unsubs = [];
 
     // Load architecture items (one-time)
     getArchitectureItems().then(archItems => {
@@ -40,37 +41,49 @@ export default function MasterBacklog() {
         ...prev,
         build: archItems.filter(i => i.stream === 'build'),
       }));
-      // Merge arch deliver items with live IVC items (handled below)
-    });
+    }).catch(err => console.warn('Master Backlog: arch load failed', err));
 
-    // Subscribe to live sources
-    const unsubDeliver = subscribeToDeliverItems(deliverItems => {
-      if (!mounted) return;
-      setItems(prev => ({ ...prev, deliver: deliverItems }));
-    });
-    const unsubOperate = subscribeToOperateItems(operateItems => {
-      if (!mounted) return;
-      setItems(prev => ({ ...prev, operate: operateItems }));
-    });
-    const unsubSales = subscribeToSalesItems(salesItems => {
-      if (!mounted) return;
-      setItems(prev => ({ ...prev, sales: salesItems }));
-    });
-    const unsubMarketing = subscribeToMarketingItems(marketingItems => {
-      if (!mounted) return;
-      setItems(prev => ({ ...prev, marketing: marketingItems }));
-    });
-    const unsubManual = subscribeToManualItems(manualItems => {
-      if (!mounted) return;
-      setItems(prev => ({ ...prev, manual: manualItems }));
-    });
+    // Subscribe to live sources — each wrapped to prevent crash
+    try {
+      unsubs.push(subscribeToDeliverItems(deliverItems => {
+        if (!mounted) return;
+        setItems(prev => ({ ...prev, deliver: deliverItems }));
+      }));
+    } catch (e) { console.warn('MB: deliver sub failed', e); }
+
+    try {
+      unsubs.push(subscribeToOperateItems(operateItems => {
+        if (!mounted) return;
+        setItems(prev => ({ ...prev, operate: operateItems }));
+      }));
+    } catch (e) { console.warn('MB: operate sub failed', e); }
+
+    try {
+      unsubs.push(subscribeToSalesItems(salesItems => {
+        if (!mounted) return;
+        setItems(prev => ({ ...prev, sales: salesItems }));
+      }));
+    } catch (e) { console.warn('MB: sales sub failed', e); }
+
+    try {
+      unsubs.push(subscribeToMarketingItems(marketingItems => {
+        if (!mounted) return;
+        setItems(prev => ({ ...prev, marketing: marketingItems }));
+      }));
+    } catch (e) { console.warn('MB: marketing sub failed', e); }
+
+    try {
+      unsubs.push(subscribeToManualItems(manualItems => {
+        if (!mounted) return;
+        setItems(prev => ({ ...prev, manual: manualItems }));
+      }));
+    } catch (e) { console.warn('MB: manual sub failed', e); }
 
     setLoading(false);
 
     return () => {
       mounted = false;
-      unsubDeliver(); unsubOperate(); unsubSales();
-      unsubMarketing(); unsubManual();
+      unsubs.forEach(fn => { try { fn?.(); } catch(e) {} });
     };
   }, []);
 

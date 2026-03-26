@@ -169,22 +169,9 @@ export function subscribeToOperateItems(callback) {
     }
   );
 
-  const unsubExp = onSnapshot(
-    collection(db, 'experiments'),
-    snap => {
-      items.experiments = snap.docs.map(d => {
-        const data = d.data();
-        if (data.status !== 'Hypothesis' && data.status !== 'Testing') return null;
-        return {
-          uid: `exp_${d.id}`, title: `Experiment: ${(data.hypothesis || '').substring(0, 60)}...`,
-          stream: 'operate', status: 'backlog', effortHours: 1, client: null, priority: 4,
-          dueDate: null, targetWeek: null, notes: data.metric || null,
-          sourceSection: 'Experiments', source: 'experiments', sourceId: d.id, _raw: data
-        };
-      }).filter(Boolean);
-      loaded.experiments = true; emit();
-    }
-  );
+  // Experiments are stored in localStorage (not Firestore), skip subscription
+  items.experiments = [];
+  loaded.experiments = true;
 
   const unsubTodos = onSnapshot(
     collection(db, 'weekly_todos'),
@@ -203,7 +190,7 @@ export function subscribeToOperateItems(callback) {
     }
   );
 
-  return () => { unsubPQ(); unsubExp(); unsubTodos(); };
+  return () => { unsubPQ(); unsubTodos(); };
 }
 
 // ── SALES TENTACLE ────────────────────────────────────────
