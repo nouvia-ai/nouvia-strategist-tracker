@@ -145,6 +145,14 @@
         { "fieldPath": "client_id", "order": "ASCENDING" },
         { "fieldPath": "status",    "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "delivery_actuals",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "engagement_id", "order": "ASCENDING" },
+        { "fieldPath": "timestamp",     "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
