@@ -105,6 +105,46 @@
         { "fieldPath": "clientId", "order": "ASCENDING" },
         { "fieldPath": "priority", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "engagements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "client_id", "order": "ASCENDING" },
+        { "fieldPath": "status",    "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "delivery_tasks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "engagement_id", "order": "ASCENDING" },
+        { "fieldPath": "status",        "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "delivery_costs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "engagement_id", "order": "ASCENDING" },
+        { "fieldPath": "cost_type",     "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "defects",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "client_id", "order": "ASCENDING" },
+        { "fieldPath": "status",    "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "change_requests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "client_id", "order": "ASCENDING" },
+        { "fieldPath": "status",    "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

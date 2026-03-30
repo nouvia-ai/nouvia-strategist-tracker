@@ -129,6 +129,32 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAuthenticated();
     }
+
+    // ── Section 8 Delivery collections ───────────────────────────────────────
+    match /engagements/{doc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /delivery_tasks/{doc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /delivery_costs/{doc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /delivery_handoffs/{doc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /defects/{doc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /change_requests/{doc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
     match /intelligence_foundations/{doc} {
       allow read: if true;
       allow write: if isAuthenticated();
