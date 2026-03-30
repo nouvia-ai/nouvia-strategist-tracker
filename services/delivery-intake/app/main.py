@@ -111,7 +111,7 @@ def now_iso() -> str:
 
 def call_gemini(prompt: str) -> dict:
     """Call Gemini 1.5 Flash via Vertex AI and parse JSON response."""
-    model = GenerativeModel("gemini-1.5-flash-001")
+    model = GenerativeModel("gemini-2.0-flash-001")
     response = model.generate_content(
         prompt,
         generation_config={
