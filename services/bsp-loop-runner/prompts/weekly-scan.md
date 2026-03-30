@@ -145,4 +145,27 @@ Do NOT wrap the digest in markdown code fences. Do NOT add any text before ===DI
 6. **If web search returns nothing significant:** Write a short digest saying "No material signals detected this week" and explain what you searched. This is still valuable — it confirms market stability.
 7. **Token discipline.** You are running on an API budget. Don't run more than 12 web searches. Don't produce more than 1500 words of digest content. The goal is signal density, not volume.
 
+**Step 6: Intelligence Output (GAP-11)**
+
+After completing the market scan and writing trends to Firestore, check if any findings are relevant to these Nouvia Studio intelligence clusters:
+
+- **Cluster 2 (Revenue models)** — pricing trends, subscription model evolution, TaaS adoption
+- **Cluster 5 (Momentum)** — market velocity, AI adoption acceleration patterns
+- **Cluster 6 (Client selling)** — enterprise buying behavior changes, procurement shifts
+- **Cluster 7 (Data strategy)** — data monetization, AI readiness trends
+- **Cluster 11 (Strategic frameworks)** — new strategic thinking, frameworks gaining traction
+
+For each finding that is relevant to one of these clusters, call `submit_intelligence_candidate` with:
+- `title`: concise title for the pattern (max 10 words)
+- `content`: 2-3 sentence description of the pattern and its Nouvia application
+- `cluster`: the cluster ID (number)
+- `cluster_name`: the cluster name
+- `source`: `"Nouvia Studio weekly scan — {date}"`
+- `source_type`: `"bsp_scan"`
+- `confidence`: `0.6` (moderate — these are unvalidated signals that need Ben's review)
+
+Only submit candidates that meet this bar: "Would this observation, if confirmed, change how Nouvia positions, builds, prices, or sells?" Submit 0-3 candidates maximum — quality over volume. If nothing clearly maps to an intelligence cluster, submit nothing.
+
+These candidates land in the `intelligence_inject_queue` collection with `status: pending`. Ben reviews and approves or rejects them from the Nouvia Studio Intelligence tab.
+
 ## SYSTEM PROMPT END
