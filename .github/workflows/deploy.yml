@@ -1,18 +1,20 @@
-name: Deploy Firestore Rules and Indexes
+name: Deploy Firestore Indexes
 
-# ⚠️ THIS REPO DOES NOT OWN FIREBASE HOSTING.
-# nouvia-os.web.app is owned by github.com/nouvia-ai/nouvia-studio.
-# Any hosting deploy from this repo WILL overwrite Nouvia Studio.
-# Hosting step has been permanently removed. DO NOT ADD IT BACK.
+# ⚠️ THIS REPO DOES NOT OWN FIREBASE HOSTING OR FIRESTORE RULES.
+# nouvia-os.web.app and firestore.rules are owned by github.com/nouvia-ai/nouvia-studio.
+# This repo deploys INDEXES ONLY. Rules are managed exclusively by nouvia-studio
+# to prevent rule overwrites from two repos competing.
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'firestore.indexes.json'
 
 jobs:
-  deploy-firestore:
-    name: Deploy Firestore Rules & Indexes
+  deploy-indexes:
+    name: Deploy Firestore Indexes
     runs-on: ubuntu-latest
 
     steps:
@@ -33,9 +35,5 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Deploy Firestore Rules
-        run: npx firebase-tools deploy --only firestore:rules --project nouvia-os --non-interactive
-
       - name: Deploy Firestore Indexes
-        continue-on-error: true
         run: npx firebase-tools deploy --only firestore:indexes --project nouvia-os --non-interactive
