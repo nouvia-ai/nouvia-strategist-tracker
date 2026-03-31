@@ -183,6 +183,12 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
 
+    // ── Scope Agent collections ───────────────────────────────────────────────
+    match /delivery_estimates/{doc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
     // ── Operations Agent collections ─────────────────────────────────────────
     match /delivery_health/{doc} {
       allow read: if true;
