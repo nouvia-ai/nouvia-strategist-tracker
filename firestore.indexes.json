@@ -180,13 +180,6 @@
       ]
     },
     {
-      "collectionGroup": "time_entries",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "date", "order": "ASCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "aims_requests",
       "queryScope": "COLLECTION",
       "fields": [
