@@ -170,6 +170,31 @@
         { "fieldPath": "engagement_id", "order": "ASCENDING" },
         { "fieldPath": "timestamp",     "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "delivery_health",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "engagement_id", "order": "ASCENDING" },
+        { "fieldPath": "checked_at",    "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "adoption_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "engagement_id", "order": "ASCENDING" },
+        { "fieldPath": "date",          "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "client_communications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "engagement_id", "order": "ASCENDING" },
+        { "fieldPath": "type",          "order": "ASCENDING" },
+        { "fieldPath": "generated_at",  "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

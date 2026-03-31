@@ -183,5 +183,19 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
 
+    // ── Operations Agent collections ─────────────────────────────────────────
+    match /delivery_health/{doc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /adoption_reports/{doc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /client_communications/{doc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
   }
 }

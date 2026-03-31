@@ -1,0 +1,30 @@
+name: Deploy Operations Agent
+
+on:
+  push:
+    branches: [main]
+    paths: ['services/delivery-operations/**']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy delivery-operations \
+            --source services/delivery-operations \
+            --project nouvia-os \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --memory 2Gi \
+            --timeout 300 \
+            --set-secrets="ANTHROPIC_API_KEY=anthropic-api-key:latest" \
+            --quiet
